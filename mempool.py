@@ -30,6 +30,7 @@ def get_mempool_data():
     print("Max retries exceeded. Exiting...")
     return None
 
+# Function to calculate the length of the column by the block size
 def calculate_bar_length(block_size):
     bar_length = min(math.ceil(block_size / (2 * 1024 * 1024) * display_height), display_height)
     logging.debug(f"Block Size: {block_size}, Bar Length: {bar_length}")
@@ -40,25 +41,15 @@ def calculate_segment_colors(fee_range):
     segment_colors = []
 
     for fee in fee_range:
-        if fee <= 5:
-            # Gradient from teal to green
+        if fee <= 3:
+            # Green
             r = 0
             g = 255
-            b = int(255 * (5 - fee) / 4)
-        elif fee <= 15:
-            # Gradient from green to yellow
-            r = int(255 * (fee - 10) / 5)
-            g = 255
-            b = 0
-        elif fee <= 20:
-            # Gradient from yellow to orange
-            r = 255
-            g = int(255 - (127 * (20 - fee) / 5 ))
             b = 0
         elif fee <= 60:
-            # Gradient from orange to red
+            # Gradient from yellow to red
             r = 255
-            g = int(128  * (60 - fee) / 40)
+            g = int(255  * (60 - fee) / 57)
             b = 0
         else:
             # Gradient from red to fuchsia
