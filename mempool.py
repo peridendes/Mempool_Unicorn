@@ -56,7 +56,7 @@ def get_mempool_data():
 # Function to calculate the length of the column by the block size
 def calculate_bar_length(block_size):
     bar_length = min(math.ceil(block_size / (2 * 1024 * 1024) * display_height), display_height)
-    logging.debug(f"Block Size: {block_size}, Bar Length: {bar_length}")
+    # logging.debug(f"Block Size: {block_size}, Bar Length: {bar_length}")
     return bar_length
 
 
@@ -95,20 +95,26 @@ def convert_data_to_led_pixels(blocks):
     led_pixels = []
 
     for block in blocks:
-        column_length = calculate_bar_length(block['blockSize'])
+        bar_length = calculate_bar_length(block['blockSize'])
         fee_range = block['feeRange']
 
         segment_colors = calculate_segment_colors(fee_range)
         segment_colors.reverse()
+        logging.debug(f"Block {block}, Bar Length: {bar_length}, Fee Range: {fee_range}, Segment Colors: {segment_colors}")
 
         led_col = []
-        segment_lengths = [column_length // display_height] * display_height
-        remainder = column_length % display_height
+        segment_lengths = [bar_length // display_height] * display_height
+        remainder = bar_length % display_height
+        logging.debug(f"Segment Lengths: {segment_lengths}, Remainder: {remainder}")
+
+
+        # Continue adding debug code
+
 
         for i in range(remainder):
             segment_lengths[i] += 1
 
-        led_col.extend([(0, 0, 0)] * (display_height - column_length))
+        led_col.extend([(0, 0, 0)] * (display_height - bar_length))
 
         for i in range(display_height):
             led_col.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
@@ -132,7 +138,7 @@ unicornhatmini.set_rotation(rotation)
 display_width, display_height = unicornhatmini.get_shape()
 
 # Too bright for the eye
-unicornhatmini.set_brightness(0.1)
+unicornhatmini.set_brightness(0.05)
 
 while True:
     blocks = get_mempool_data()
@@ -143,7 +149,7 @@ while True:
             median_fee = block['medianFee']
             fee_range = block['feeRange']
             bar_length = calculate_bar_length(block['blockSize'])
-            logging.debug(f"Block {i + 1}, Median Fee: {median_fee}, Fee Range: {fee_range}, Bar Length: {bar_length}")
+            logging.debug(f"Block {i}, Bar Length: {bar_length}, Median Fee: {median_fee}, Fee Range: {fee_range}")
 
     led_pixels = convert_data_to_led_pixels(reversed(blocks))
 
