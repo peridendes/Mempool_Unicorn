@@ -10,7 +10,6 @@ logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
-    # Check if MEMPOOL_NODE_ADDRESS environment variable exists
     node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
     if not node_address:
         # Check if the .env file exists and load the environment variables from it
@@ -19,7 +18,9 @@ def get_mempool_data():
                 for line in f:
                     key, value = line.strip().split("=")
                     os.environ[key] = value
-        else:
+            node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
+
+        if not node_address:
             node_address = input("Enter your mempool.space self-hosted node address: ")
             os.environ["MEMPOOL_NODE_ADDRESS"] = node_address
 
@@ -27,25 +28,29 @@ def get_mempool_data():
             with open(".env", "w") as f:
                 f.write(f"MEMPOOL_NODE_ADDRESS={node_address}\n")
 
-    url = f"{node_address}/api/v1/fees/mempool-blocks"
-    max_retries = 3
-    retry_interval = 15  # seconds
-    retries = 0
+    if node_address:
+        url = f"{node_address}/api/v1/fees/mempool-blocks"
+        max_retries = 3
+        retry_interval = 15  # seconds
+        retries = 0
 
-    while retries < max_retries:
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            data = response.json()
-            blocks = data[:8]  # Retrieve 8 blocks from the API
-            return blocks
-        except (requests.exceptions.RequestException, ValueError) as e:
-            print(f"Error occurred: {e}")
-            print("Retrying after 15 seconds...")
-            time.sleep(retry_interval)
-            retries += 1
+        while retries < max_retries:
+            try:
+                response = requests.get(url)
+                response.raise_for_status()
+                data = response.json()
+                blocks = data[:8]  # Retrieve 8 blocks from the API
+                return blocks
+            except (requests.exceptions.RequestException, ValueError) as e:
+                print(f"Error occurred: {e}")
+                print("Retrying after 15 seconds...")
+                time.sleep(retry_interval)
+                retries += 1
 
-    print("Max retries exceeded. Exiting...")
+        print("Max retries exceeded. Exiting...")
+    else:
+        print("No MEMPOOL_NODE_ADDRESS found. Exiting...")
+
     return None
 
 # Function to calculate the length of the column by the block size
@@ -53,6 +58,7 @@ def calculate_bar_length(block_size):
     bar_length = min(math.ceil(block_size / (2 * 1024 * 1024) * display_height), display_height)
     logging.debug(f"Block Size: {block_size}, Bar Length: {bar_length}")
     return bar_length
+
 
 # Function to calculate the segment colors based on fee range
 def calculate_segment_colors(fee_range):
