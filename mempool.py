@@ -9,7 +9,12 @@ logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
-    url = 'https://mempool.space/api/v1/fees/mempool-blocks'
+    node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
+    if not node_address:
+        node_address = input("Enter your mempool.space self-hosted node address: ")
+        os.environ["MEMPOOL_NODE_ADDRESS"] = node_address
+
+    url = f"{node_address}/api/v1/fees/mempool-blocks"
     max_retries = 3
     retry_interval = 15  # seconds
     retries = 0
@@ -107,6 +112,12 @@ display_width, display_height = unicornhatmini.get_shape()
 # Too bright for the eye
 unicornhatmini.set_brightness(0.1)
 
+# Check if MEMPOOL_NODE_ADDRESS environment variable exists
+node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
+if not node_address:
+    node_address = input("Enter your mempool.space self-hosted node address: ")
+    os.environ["MEMPOOL_NODE_ADDRESS"] = node_address
+
 while True:
     blocks = get_mempool_data()
 
@@ -126,4 +137,4 @@ while True:
             unicornhatmini.set_pixel(y, x, r, g, b)
 
     unicornhatmini.show()
-    time.sleep(15)  # Wait for 15 seconds before refreshing the data and screen
+    time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
