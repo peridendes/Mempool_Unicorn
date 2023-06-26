@@ -66,8 +66,13 @@ def calculate_segment_colors(fee_range):
 
     for fee in fee_range:
         if fee <= 10:
+            # Blue to Green
+            r = 0
+            g = int(255 * fee / 10)
+            b = int(255 * (10 - fee) / 10)
+        elif fee <= 20:
             # Green to Yellow
-            r = int(255 * fee / 10)
+            r = int(255 * (fee - 10) / 10)
             g = 255
             b = 0
         elif fee <= 60:
