@@ -100,7 +100,7 @@ def convert_data_to_led_pixels(blocks):
 
         segment_colors = calculate_segment_colors(fee_range)
         segment_colors.reverse()
-        logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Range: {fee_range}, Segment Colors: {segment_colors}")
+        logging.debug(f"Block {i}, Bar Length: {bar_length}\nFee Range: {fee_range}\nSegment Colors: {segment_colors}")
 
         led_col = []
         segment_lengths = [bar_length // display_height] * display_height
@@ -142,15 +142,6 @@ unicornhatmini.set_brightness(0.05)
 
 while True:
     blocks = get_mempool_data()
-
-    # Debugging
-    if blocks is not None:
-        for i, block in enumerate(blocks):
-            median_fee = block['medianFee']
-            fee_range = block['feeRange']
-            bar_length = calculate_bar_length(block['blockSize'])
-            logging.debug(f"Block {i}, Bar Length: {bar_length}, Median Fee: {median_fee}, Fee Range: {fee_range}")
-
     led_pixels = convert_data_to_led_pixels(reversed(blocks))
 
     for y, led_row in enumerate(led_pixels):
