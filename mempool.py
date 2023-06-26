@@ -10,10 +10,22 @@ logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
+    # Check if MEMPOOL_NODE_ADDRESS environment variable exists
     node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
     if not node_address:
-        node_address = input("Enter your mempool.space self-hosted node address: ")
-        os.environ["MEMPOOL_NODE_ADDRESS"] = node_address
+        # Check if the .env file exists and load the environment variables from it
+        if os.path.exists(".env"):
+            with open(".env", "r") as f:
+                for line in f:
+                    key, value = line.strip().split("=")
+                    os.environ[key] = value
+        else:
+            node_address = input("Enter your mempool.space self-hosted node address: ")
+            os.environ["MEMPOOL_NODE_ADDRESS"] = node_address
+
+            # Save the environment variable to the user's machine
+            with open(".env", "w") as f:
+                f.write(f"MEMPOOL_NODE_ADDRESS={node_address}\n")
 
     url = f"{node_address}/api/v1/fees/mempool-blocks"
     max_retries = 3
@@ -49,7 +61,7 @@ def calculate_segment_colors(fee_range):
     for fee in fee_range:
         if fee <= 10:
             # Green to Yellow
-            r = 255 - int(255 * (10 - fee) / 10)
+            r = 255 - int(255 * fee / 10)
             g = 255
             b = 0
         elif fee <= 60:
