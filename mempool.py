@@ -47,15 +47,15 @@ def calculate_segment_colors(fee_range):
     segment_colors = []
 
     for fee in fee_range:
-        if fee <= 3:
-            # Green
-            r = 0
+        if fee <= 10:
+            # Green to Yellow
+            r = 255 - int(255 * (10 - fee) / 10)
             g = 255
             b = 0
         elif fee <= 60:
-            # Gradient from yellow to red
+            # Yellow to Red
             r = 255
-            g = int(255 * (60 - fee) / 57)
+            g = int(255 * (60 - fee) / 50)
             b = 0
         else:
             # Gradient from red to fuchsia
