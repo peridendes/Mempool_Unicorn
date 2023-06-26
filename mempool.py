@@ -1,7 +1,11 @@
 import requests
 import math
 import time
+import sys
 from unicornhatmini import UnicornHATMini
+import logging
+
+logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
@@ -26,21 +30,21 @@ def get_mempool_data():
     print("Max retries exceeded. Exiting...")
     return None
 
+def calculate_bar_length(block_size):
+    bar_length = min(math.ceil(block_size / (2 * 1024 * 1024) * display_height), display_height)
+    logging.debug(f"Block Size: {block_size}, Bar Length: {bar_length}")
+    return bar_length
+
 # Function to calculate the segment colors based on fee range
 def calculate_segment_colors(fee_range):
     segment_colors = []
 
     for fee in fee_range:
         if fee <= 5:
-            # Gradient from white to blue
-            r = int(255 * (5 - fee) / 4)
-            g = int(255 * (5 - fee) / 4)
-            b = 255
-        elif fee <= 10:
-            # Gradient from blue to green
+            # Gradient from teal to green
             r = 0
-            g = int(255 * (fee - 5) / 5)
-            b = int(255 * (10 - fee) / 5)
+            g = 255
+            b = int(255 * (5 - fee) / 4)
         elif fee <= 15:
             # Gradient from green to yellow
             r = int(255 * (fee - 10) / 5)
@@ -73,21 +77,21 @@ def convert_data_to_led_pixels(blocks):
     blocks = blocks[::-1]  # Reverse the order of blocks
 
     for block in blocks:
-        block_size = block['blockSize']
-        column_length = min(math.ceil(block_size / (2 * 1024 * 1024) * 7), 7)  # Calculate column length
+        column_length = calculate_bar_length(block['blockSize'])
         fee_range = block['feeRange']
 
         segment_colors = calculate_segment_colors(fee_range)
         segment_colors.reverse()
         
         led_col = []
-        segment_lengths = [column_length // 7] * 7
-        remainder = column_length % 7
+        segment_lengths = [column_length // display_height] * display_height
+        remainder = column_length % display_height
 
         for i in range(remainder):
             segment_lengths[i] += 1
 
-        led_col.extend([(0, 0, 0)] * (7 - column_length))
+        led_col.extend([(0, 0, 0)] * (display_height - column_length))
+
         for i in range(len(segment_colors)):
             led_col.extend([segment_colors[i]] * segment_lengths[i])
 
@@ -98,8 +102,31 @@ def convert_data_to_led_pixels(blocks):
 # Main program
 unicornhatmini = UnicornHATMini()
 
+rotation = 0
+if len(sys.argv) > 1:
+    try:
+        rotation = int(sys.argv[1])
+    except ValueError:
+        print("Usage: {} <rotation>".format(sys.argv[0]))
+        sys.exit(1)
+
+unicornhatmini.set_rotation(rotation)
+display_width, display_height = unicornhatmini.get_shape()
+
+# Too bright for the eye
+unicornhatmini.set_brightness(0.1)
+
 while True:
     blocks = get_mempool_data()
+
+    # Debugging
+    if blocks is not None:
+        for i, block in enumerate(blocks):
+            median_fee = block['medianFee']
+            fee_range = block['feeRange']
+            bar_length = calculate_bar_length(block['blockSize'])
+            logging.debug(f"Block {i+1}, Median Fee: {median_fee}, Fee Range: {fee_range}, Bar Length: {bar_length}")
+
     led_pixels = convert_data_to_led_pixels(blocks)
 
     for y, led_row in enumerate(led_pixels):
