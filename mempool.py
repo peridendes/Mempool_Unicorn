@@ -25,7 +25,7 @@ def get_mempool_data():
             response = requests.get(url)
             response.raise_for_status()
             data = response.json()
-            blocks = data[:8] # Retrieve 8 blocks from the API
+            blocks = data[:8]  # Retrieve 8 blocks from the API
             return blocks
         except (requests.exceptions.RequestException, ValueError) as e:
             print(f"Error occurred: {e}")
@@ -55,7 +55,7 @@ def calculate_segment_colors(fee_range):
         elif fee <= 60:
             # Gradient from yellow to red
             r = 255
-            g = int(255  * (60 - fee) / 57)
+            g = int(255 * (60 - fee) / 57)
             b = 0
         else:
             # Gradient from red to fuchsia
@@ -79,7 +79,7 @@ def convert_data_to_led_pixels(blocks):
 
         segment_colors = calculate_segment_colors(fee_range)
         segment_colors.reverse()
-        
+
         led_col = []
         segment_lengths = [column_length // display_height] * display_height
         remainder = column_length % display_height
@@ -89,8 +89,8 @@ def convert_data_to_led_pixels(blocks):
 
         led_col.extend([(0, 0, 0)] * (display_height - column_length))
 
-        for i in range(len(segment_colors)):
-            led_col.extend([segment_colors[i]] * segment_lengths[i])
+        for i in range(display_height):
+            led_col.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
 
         led_pixels.append(led_col)
 
@@ -113,12 +113,6 @@ display_width, display_height = unicornhatmini.get_shape()
 # Too bright for the eye
 unicornhatmini.set_brightness(0.1)
 
-# Check if MEMPOOL_NODE_ADDRESS environment variable exists
-node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
-if not node_address:
-    node_address = input("Enter your mempool.space self-hosted node address: ")
-    os.environ["MEMPOOL_NODE_ADDRESS"] = node_address
-
 while True:
     blocks = get_mempool_data()
 
@@ -128,7 +122,7 @@ while True:
             median_fee = block['medianFee']
             fee_range = block['feeRange']
             bar_length = calculate_bar_length(block['blockSize'])
-            logging.debug(f"Block {i+1}, Median Fee: {median_fee}, Fee Range: {fee_range}, Bar Length: {bar_length}")
+            logging.debug(f"Block {i + 1}, Median Fee: {median_fee}, Fee Range: {fee_range}, Bar Length: {bar_length}")
 
     led_pixels = convert_data_to_led_pixels(blocks)
 
