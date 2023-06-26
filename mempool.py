@@ -1,9 +1,10 @@
-import requests
-import math
-import time
-import sys
-from unicornhatmini import UnicornHATMini
 import logging
+import math
+import os
+import requests
+import sys
+import time
+from unicornhatmini import UnicornHATMini
 
 logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
