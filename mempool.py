@@ -94,13 +94,13 @@ def calculate_segment_colors(fee_range):
 def convert_data_to_led_pixels(blocks):
     led_pixels = []
 
-    for block in blocks:
+    for i, block in enumerate(blocks):
         bar_length = calculate_bar_length(block['blockSize'])
         fee_range = block['feeRange']
 
         segment_colors = calculate_segment_colors(fee_range)
         segment_colors.reverse()
-        logging.debug(f"Block {block}, Bar Length: {bar_length}, Fee Range: {fee_range}, Segment Colors: {segment_colors}")
+        logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Range: {fee_range}, Segment Colors: {segment_colors}")
 
         led_col = []
         segment_lengths = [bar_length // display_height] * display_height
