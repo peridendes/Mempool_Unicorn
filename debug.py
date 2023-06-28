@@ -148,6 +148,9 @@ def convert_data_to_led_pixels(blocks):
         logging.debug(f"Fee Range: {fee_range}")
         logging.debug(f"Segment Colors Length: {len(segment_colors)}")  # Add this line
 
+        # Creating blank spots. may not be needed.
+        led_bar.extend([(0, 0, 0)] * (display_height - bar_length))
+
         for i in range(display_height):
             logging.debug(f"i: {i}, len(segment_colors): {len(segment_colors)}")  # Add this line
             led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
