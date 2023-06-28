@@ -59,44 +59,36 @@ def calculate_bar_length(block_size):
     return bar_length
 
 # Function to reduce fee range by 1
-def handle_long_fee_range(fee_range):
-    # Calculate the indices of the values closest to the middle position
-    middle_index = len(fee_range) // 2
-    a_index = middle_index - 1
-    b_index = middle_index + 1
+def handle_fee_range(fee_range, bar_length):
+    while fee_range != bar_length:
+        # Calculate the indices of the values closest to the middle position
+        middle_index = len(fee_range) // 2
 
-    # Find the values closest to the middle position
-    a = fee_range[a_index]
-    b = fee_range[b_index]
+        # Check if the range is odd
+        if len(fee_range) % 2 != 0:
+            middle_index += 1
 
-    # Calculate the average
-    C = (a + b) / 2
+        a_index = middle_index
+        b_index = middle_index + 1
 
-    # Remove a and b from fee_range
-    fee_range.pop(b_index)
-    fee_range.pop(a_index)
+        # Find the values closest to the middle position
+        a = fee_range[a_index]
+        b = fee_range[b_index]
 
-    # Insert C at the middle position
-    fee_range.insert(middle_index, C)
+        # Calculate the average
+        C = (a + b) / 2
 
-    return fee_range
+        if fee_range > bar_length:
+            # Remove a and b from fee_range
+            fee_range.pop(b_index)
+            fee_range.pop(a_index)
 
-# Function to increase fee range by 1
-def handle_short_fee_range(fee_range):
-    # Calculate the indices of the values closest to the middle position
-    middle_index = len(fee_range) // 2
-    a_index = middle_index
-    b_index = middle_index + 1
+            # Insert C at the middle position
+            fee_range.insert(middle_index, C)
 
-    # Find the values closest to the middle position
-    a = fee_range[a_index]
-    b = fee_range[b_index]
-
-    # Calculate the average
-    C = (a + b) / 2
-
-    # Insert C between a and b in the fee_range
-    fee_range.insert(b_index, C)
+        if fee_range < bar_length:
+            # Insert C between a and b in the fee_range
+            fee_range.insert(b_index, C)
 
     return fee_range
 
@@ -139,13 +131,7 @@ def convert_data_to_led_pixels(blocks):
         fee_range = block['feeRange']
         logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
 
-        while len(fee_range) > bar_length:
-            fee_range = handle_long_fee_range(fee_range)
-            logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
-
-        while len(fee_range) < bar_length:
-            fee_range = handle_short_fee_range(fee_range)
-            logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
+        fee_range = handle_fee_range(fee_range, bar_length)
 
         segment_colors = calculate_segment_colors(fee_range)
 
