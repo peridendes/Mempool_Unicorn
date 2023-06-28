@@ -119,7 +119,7 @@ def convert_data_to_led_pixels(blocks):
 
         segment_count = len(fee_range)
         logging.debug(f"Segment Count: {segment_count}")
-        segment_lengths = bar_length // segment_count
+        segment_lengths = [bar_length // segment_count] * segment_count
         logging.debug(f"Segment Lengths: {segment_lengths}")
         remainder = bar_length % segment_count
         logging.debug(f"Remainder: {remainder}")
