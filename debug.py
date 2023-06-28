@@ -89,7 +89,7 @@ def calculate_segment_colors(fee_range):
     return segment_colors
 
 # Function to reduce fee range by 1
-def reduce_fee_range(fee_range):
+def handle_long_fee_range(fee_range):
     # Calculate the indices of the values closest to the middle position
     middle_index = len(fee_range) // 2
     a_index = middle_index - 1
