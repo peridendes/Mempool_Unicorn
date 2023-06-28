@@ -125,7 +125,7 @@ def convert_data_to_led_pixels(blocks):
 # Main program
 unicornhatmini = UnicornHATMini()
 
-rotation = 180
+rotation = 0
 if len(sys.argv) > 1:
     try:
         rotation = int(sys.argv[1])
