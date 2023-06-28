@@ -60,7 +60,7 @@ def calculate_bar_length(block_size):
 
 # Function to adjust fee range to match bar length
 def form_fit_fees(fee_range, bar_length):
-    while fee_range != bar_length:
+    while len(fee_range) != bar_length:
         # Calculate the indices of the values closest to the middle position
         middle_index = len(fee_range) // 2
 
@@ -78,7 +78,7 @@ def form_fit_fees(fee_range, bar_length):
         # Calculate the average
         C = (a + b) / 2
 
-        if fee_range > bar_length:
+        if len(fee_range) > bar_length:
             # Remove a and b from fee_range
             fee_range.pop(b_index)
             fee_range.pop(a_index)
@@ -86,7 +86,7 @@ def form_fit_fees(fee_range, bar_length):
             # Insert C at the middle position
             fee_range.insert(middle_index, C)
 
-        if fee_range < bar_length:
+        if len(fee_range) < bar_length:
             # Insert C between a and b in the fee_range
             fee_range.insert(b_index, C)
 
