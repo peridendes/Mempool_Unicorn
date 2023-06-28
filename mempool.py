@@ -137,15 +137,15 @@ def convert_data_to_led_pixels(blocks):
     for i, block in enumerate(blocks):
         bar_length = calculate_bar_length(block['blockSize'])
         fee_range = block['feeRange']
-        logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}")
+        logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
 
         while len(fee_range) > bar_length:
             fee_range = handle_long_fee_range(fee_range)
-            logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}")
+            logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
 
         while len(fee_range) < bar_length:
             fee_range = handle_short_fee_range(fee_range)
-            logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}")
+            logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
 
         segment_colors = calculate_segment_colors(fee_range)
 
@@ -155,9 +155,6 @@ def convert_data_to_led_pixels(blocks):
 
         for i in range(remainder):
             segment_lengths[i] += 1
-
-        # Creating blank spots. may not be needed.
-        # led_bar.extend([(0, 0, 0)] * (display_height - bar_length))
 
         for i in range(display_height):
             led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
@@ -169,7 +166,7 @@ def convert_data_to_led_pixels(blocks):
 # Main program
 unicornhatmini = UnicornHATMini()
 
-rotation = 0
+rotation = 180
 if len(sys.argv) > 1:
     try:
         rotation = int(sys.argv[1])
