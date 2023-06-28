@@ -6,6 +6,8 @@ import sys
 import time
 from unicornhatmini import UnicornHATMini
 
+logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
+
 # Function to retrieve mempool data from the API
 def get_mempool_data():
     node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
