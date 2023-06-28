@@ -100,25 +100,43 @@ def convert_data_to_led_pixels(blocks):
         logging.debug(f"Block {i}, Bar Length: {bar_length}\nFee Range: {fee_range}\nSegment Colors: {segment_colors}")
 
         led_bar = []
-        segment_lengths = [bar_length // display_height] * display_height
-        remainder = bar_length % display_height
+        # segment_lengths = [bar_length // display_height] * display_height
+        # remainder = bar_length % display_height
+        # logging.debug(f"Segment Lengths: {segment_lengths}, Remainder: {remainder}")
+
+        # for i in range(remainder):
+        #     segment_lengths[i] += 1
+        #     logging.debug(f"Line 109 {i}\nSegment Lenghts: {segment_lengths}")
+
+        # # Creating blank spots. may not be needed.
+        # led_bar.extend([(0, 0, 0)] * (display_height - bar_length))
+        # logging.debug(f"LED Bar: {led_bar}")
+
+        # for i in range(display_height):
+        #     led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
+        #     logging.debug(f"Line 116 {i}\nLED Bar: {led_bar}")
+
+        segment_count = len(segment_colors)
+        segment_lengths = bar_length // segment_count
+        remainder = bar_length % segment_count
         logging.debug(f"Segment Lengths: {segment_lengths}, Remainder: {remainder}")
 
-        for i in range(remainder):
-            segment_lengths[i] += 1
-            logging.debug(f"Line 109 {i}\nSegment Lenghts: {segment_lengths}")
+        for i in range(segment_count):
+            segment_start = i * segment_lengths
+            segment_end = segment_start + segment_lengths
+            logging.debug(f"Segment Start: {segment_start}, Segment Start: {segment_end}")
 
-        # Creating blank spots. may not be needed.
-        led_bar.extend([(0, 0, 0)] * (display_height - bar_length))
-        logging.debug(f"LED Bar: {led_bar}")
+            if i < remainder:
+                segment_end += 1
+                logging.debug(f"Segment Start: {segment_start}, Segment Start: {segment_end}")
 
-        for i in range(display_height):
-            led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
-            logging.debug(f"Line 116 {i}\nLED Bar: {led_bar}")
+            logging.debug(f"Before Line 134 {i}\nLED Bar: {led_bar}")
+            led_bar.extend([segment_colors[i]] * (segment_end - segment_start))
+            logging.debug(f"After Line 134 {i}\nLED Bar: {led_bar}")
 
-        logging.debug(f"Before Line 121 {i}\nLED Pixels: {led_pixels}")
+        logging.debug(f"Before Line 137 {i}\nLED Pixels: {led_pixels}")
         led_pixels.append(led_bar)
-        logging.debug(f"After Line 121 {i}\nLED Pixels: {led_pixels}")
+        logging.debug(f"After Line 137 {i}\nLED Pixels: {led_pixels}")
 
     return led_pixels
 
