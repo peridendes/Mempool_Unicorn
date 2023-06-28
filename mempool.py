@@ -58,8 +58,8 @@ def calculate_bar_length(block_size):
     bar_length = min(math.ceil(block_size / (2 * 1024 * 1024) * display_height), display_height)
     return bar_length
 
-# Function to reduce fee range by 1
-def handle_fee_range(fee_range, bar_length):
+# Function to adjust fee range to match bar length
+def form_fit_fees(fee_range, bar_length):
     while fee_range != bar_length:
         # Calculate the indices of the values closest to the middle position
         middle_index = len(fee_range) // 2
@@ -131,7 +131,7 @@ def convert_data_to_led_pixels(blocks):
         fee_range = block['feeRange']
         logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
 
-        fee_range = handle_fee_range(fee_range, bar_length)
+        fee_range = form_fit_fees(fee_range, bar_length)
 
         segment_colors = calculate_segment_colors(fee_range)
 
