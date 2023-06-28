@@ -97,7 +97,8 @@ def convert_data_to_led_pixels(blocks):
         fee_range = block['feeRange']
 
         segment_colors = calculate_segment_colors(fee_range)
-        logging.debug(f"Block {i}, Bar Length: {bar_length}\nFee Range: {fee_range}\nSegment Colors: {segment_colors}")
+        logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(segment_colors)}")
+        # logging.debug(f"Fee Range: {fee_range}\nSegment Colors: {segment_colors}")
 
         led_bar = []
         # segment_lengths = [bar_length // display_height] * display_height
@@ -117,11 +118,15 @@ def convert_data_to_led_pixels(blocks):
         #     logging.debug(f"Line 116 {i}\nLED Bar: {led_bar}")
 
         segment_count = len(segment_colors)
+        logging.debug(f"Segment Count: {segment_count}")
         segment_lengths = bar_length // segment_count
+        logging.debug(f"Segment Lengths: {segment_lengths}")
         remainder = bar_length % segment_count
-        logging.debug(f"Segment Lengths: {segment_lengths}, Remainder: {remainder}")
+        logging.debug(f"Remainder: {remainder}")
 
         for i in range(segment_count):
+            logging.debug(f"Line 127 {i}")
+            logging.debug(f"Segment Start: {segment_start}, Segment Start: {segment_end}")
             segment_start = i * segment_lengths
             segment_end = segment_start + segment_lengths
             logging.debug(f"Segment Start: {segment_start}, Segment Start: {segment_end}")
@@ -130,13 +135,13 @@ def convert_data_to_led_pixels(blocks):
                 segment_end += 1
                 logging.debug(f"Segment Start: {segment_start}, Segment Start: {segment_end}")
 
-            logging.debug(f"Before Line 134 {i}\nLED Bar: {led_bar}")
+            logging.debug(f"Before Line 139 {i}\nLED Bar: {led_bar}")
             led_bar.extend([segment_colors[i]] * (segment_end - segment_start))
-            logging.debug(f"After Line 134 {i}\nLED Bar: {led_bar}")
+            logging.debug(f"After Line 139 {i}\nLED Bar: {led_bar}")
 
-        logging.debug(f"Before Line 137 {i}\nLED Pixels: {led_pixels}")
+        logging.debug(f"Before Line 142 {i}\nLED Pixels: {led_pixels}")
         led_pixels.append(led_bar)
-        logging.debug(f"After Line 137 {i}\nLED Pixels: {led_pixels}")
+        logging.debug(f"After Line 142 {i}\nLED Pixels: {led_pixels}")
 
     return led_pixels
 
@@ -165,7 +170,7 @@ while True:
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
             unicornhatmini.set_pixel(y, x, r, g, b)
-            logging.debug(f"Y:{y} X:{x}\nR:{r}\nG:{g}\nB:{b}\nPixel Color:{pixel_color}")
+            # logging.debug(f"Y:{y} X:{x}\nR:{r}\nG:{g}\nB:{b}\nPixel Color:{pixel_color}")
 
     unicornhatmini.show()
     time.sleep(600)  # Wait for 10 minutes before refreshing the data and screen
