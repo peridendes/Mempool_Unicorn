@@ -116,6 +116,7 @@ def convert_data_to_led_pixels(blocks):
     for i, block in enumerate(blocks):
         bar_length = calculate_bar_length(block['blockSize'])
         fee_range = block['feeRange']
+        logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}")
 
         if len(fee_range) > bar_length:
             fee_range = handle_long_fee_range(fee_range)
