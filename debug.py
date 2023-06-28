@@ -90,28 +90,6 @@ def calculate_segment_colors(fee_range):
     logging.debug(f"Segment Colors: {segment_colors}")
     return segment_colors
 
-# Function to reduce fee range by 1
-def handle_long_fee_range(fee_range):
-    # Calculate the indices of the values closest to the middle position
-    middle_index = len(fee_range) // 2
-    a_index = middle_index - 1
-    b_index = middle_index + 1
-
-    # Find the values closest to the middle position
-    a = fee_range[a_index]
-    b = fee_range[b_index]
-
-    # Calculate the average
-    C = (a + b) / 2
-
-    # Remove a and b from fee_range
-    fee_range.pop(b_index)
-    fee_range.pop(a_index)
-
-    # Insert C at the middle position
-    fee_range.insert(middle_index, C)
-
-    return fee_range
 
 # Function to convert mempool data to LED pixels
 def convert_data_to_led_pixels(blocks):
