@@ -141,7 +141,7 @@ def convert_data_to_led_pixels(blocks):
             led_bar.extend([segment_colors[i]] * (segment_end - segment_start))
             logging.debug(f"After Line 139 {i}\nLED Bar: {led_bar}")
 
-        logging.debug(f"Before Line 142 {i}\nLED Pixels: {led_pixels}")
+        logging.debug(f"{fee_range}")
         led_pixels.append(led_bar)
         logging.debug(f"After Line 142 {i}\nLED Pixels: {led_pixels}")
 
