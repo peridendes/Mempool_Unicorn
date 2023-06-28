@@ -115,7 +115,7 @@ def convert_data_to_led_pixels(blocks):
 # Main program
 unicornhatmini = UnicornHATMini()
 
-rotation = 180
+rotation = 0
 if len(sys.argv) > 1:
     try:
         rotation = int(sys.argv[1])
@@ -136,7 +136,7 @@ while True:
     for y, led_row in enumerate(led_pixels):
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
-            unicornhatmini.set_pixel(y, x, r, g, b)
+            unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
 
     unicornhatmini.show()
     time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen

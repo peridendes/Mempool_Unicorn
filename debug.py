@@ -123,15 +123,22 @@ def convert_data_to_led_pixels(blocks):
         logging.debug(f"Segment Lengths: {segment_lengths}")
         remainder = bar_length % segment_count
         logging.debug(f"Remainder: {remainder}")
+        logging.debug(f"{fee_range}")
 
         # Handle the case when there are more segments than spots available
         if segment_count > bar_length:
             # Calculate the number of elements to drop from the middle of the feeRange
             drop_count = segment_count - bar_length
+            logging.debug(f"{segment_count} - {bar_length} = {drop_count}")
             drop_start = drop_count // 2
+            logging.debug(f"{drop_count} // 2 = {drop_start}")
             drop_end = drop_start + drop_count % 2
+            logging.debug(f"{drop_end} + {drop_start} % 2 = {drop_end}")
 
             # Drop the elements from the middle of the feeRange
+            logging.debug(f"{fee_range}")
+            logging.debug(f"{fee_range[:drop_start]}")
+            logging.debug(f"{fee_range[-drop_end:]}")
             fee_range = fee_range[:drop_start] + fee_range[-drop_end:]
             logging.debug(f"{fee_range}")
 
@@ -158,7 +165,7 @@ def convert_data_to_led_pixels(blocks):
                 logging.debug(f"Segment Start: {segment_start}, Segment End: {segment_end}")
 
             led_bar.extend([segment_colors[i]] * (segment_end - segment_start))
-            logging.debug(f"ALED Bar: {led_bar}")
+            logging.debug(f"LED Bar: {led_bar}")
 
         logging.debug(f"Fee Range: {fee_range}")
         led_pixels.append(led_bar)
