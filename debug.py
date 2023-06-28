@@ -96,8 +96,8 @@ def convert_data_to_led_pixels(blocks):
         bar_length = calculate_bar_length(block['blockSize'])
         fee_range = block['feeRange']
 
-        segment_colors = calculate_segment_colors(fee_range)
-        logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(segment_colors)}")
+        
+        logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}")
         # logging.debug(f"Fee Range: {fee_range}\nSegment Colors: {segment_colors}")
 
         led_bar = []
@@ -117,7 +117,7 @@ def convert_data_to_led_pixels(blocks):
         #     led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
         #     logging.debug(f"Line 116 {i}\nLED Bar: {led_bar}")
 
-        segment_count = len(segment_colors)
+        segment_count = len(fee_range)
         logging.debug(f"Segment Count: {segment_count}")
         segment_lengths = bar_length // segment_count
         logging.debug(f"Segment Lengths: {segment_lengths}")
@@ -130,43 +130,57 @@ def convert_data_to_led_pixels(blocks):
             # Calculate the number of elements to drop from the middle of the feeRange
             drop_count = segment_count - bar_length
             logging.debug(f"{segment_count} - {bar_length} = {drop_count}")
+            # Calculate the number of elements to drop from each side
             drop_start = drop_count // 2
             logging.debug(f"{drop_count} // 2 = {drop_start}")
-            drop_end = drop_start + drop_count % 2
-            logging.debug(f"{drop_end} + {drop_start} % 2 = {drop_end}")
+            drop_end = drop_count - drop_start
+            logging.debug(f"{drop_count} - {drop_start} = {drop_end}")
 
-            # Drop the elements from the middle of the feeRange
-            logging.debug(f"{fee_range}")
-            logging.debug(f"{fee_range[:drop_start]}")
-            logging.debug(f"{fee_range[-drop_end:]}")
-            fee_range = fee_range[:drop_start] + fee_range[-drop_end:]
-            logging.debug(f"{fee_range}")
+            # Calculate the step size to evenly distribute the remaining values
+            # Subtract 2 from bar_length to keep min & max fee values
+            step_size = (len(fee_range) - drop_count) / (bar_length - 2)
 
-            # Recalculate the segment count and length
+            # Calculate the indices of the feeRange to keep
+            indices = [int(i * step_size + drop_start) for i in range(bar_length - 2)]  # Subtract 2 for the upper and lower bounds
+
+            # Create a new feeRange with the selected indices and add the upper and lower bounds
+            new_fee_range = [min(fee_range), max(fee_range)] + [fee_range[i] for i in indices]
+            logging.debug(f"{new_fee_range}")
+
+            # Recalculate the segment count and lengths
             segment_count = bar_length
             logging.debug(f"Segment Count: {segment_count}")
-            segment_lengths = bar_length // segment_count
+            segment_lengths = [bar_length // segment_count] * segment_count
             logging.debug(f"Segment Lengths: {segment_lengths}")
             remainder = bar_length % segment_count
             logging.debug(f"Remainder: {remainder}")
 
-# Proceed with coloring the segments as before
+            # Distribute the remainder pixels evenly across the segments
+            for i in range(remainder):
+                segment_lengths[i] += 1
+
+            # Recalculate the segment colors based on the new feeRange
+            segment_colors = calculate_segment_colors(new_fee_range)
+
+        # Proceed with coloring the segments as before
         for i in range(segment_count):
-            logging.debug(f"Line 127 {i}")
-            logging.debug(f"{i} * {segment_lengths}")
-            segment_start = i * segment_lengths
+            logging.debug(f"Line 175 {i}")
+            segment_start = sum(segment_lengths[:i])
+            #segment_start = i * segment_lengths
             logging.debug(f"{segment_start}")
-            logging.debug(f"{segment_start} + {segment_lengths}")
-            segment_end = segment_start + segment_lengths
+            segment_end = segment_start + segment_lengths[i]
+            #segment_end = segment_start + segment_lengths
             logging.debug(f"Segment End: {segment_end}")
 
-            if i < remainder:
-                segment_end += 1
-                logging.debug(f"Segment Start: {segment_start}, Segment End: {segment_end}")
+            # if i < remainder:
+            #     segment_end += 1
+            #     logging.debug(f"Segment Start: {segment_start}, Segment End: {segment_end}")
 
+            # segment_colors = calculate_segment_colors(fee_range)
             led_bar.extend([segment_colors[i]] * (segment_end - segment_start))
             logging.debug(f"LED Bar: {led_bar}")
 
+        logging.debug(f"Fee Range: {new_fee_range}")
         logging.debug(f"Fee Range: {fee_range}")
         led_pixels.append(led_bar)
 
