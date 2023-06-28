@@ -157,13 +157,11 @@ def convert_data_to_led_pixels(blocks):
                 segment_end += 1
                 logging.debug(f"Segment Start: {segment_start}, Segment End: {segment_end}")
 
-            logging.debug(f"Before Line 139 {i}\nLED Bar: {led_bar}")
             led_bar.extend([segment_colors[i]] * (segment_end - segment_start))
-            logging.debug(f"After Line 139 {i}\nLED Bar: {led_bar}")
+            logging.debug(f"ALED Bar: {led_bar}")
 
-        logging.debug(f"{fee_range}")
+        logging.debug(f"Fee Range: {fee_range}")
         led_pixels.append(led_bar)
-        logging.debug(f"After Line 142 {i}\nLED Pixels: {led_pixels}")
 
     return led_pixels
 
@@ -191,7 +189,7 @@ while True:
     for y, led_row in enumerate(led_pixels):
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
-            unicornhatmini.set_pixel(y, x, r, g, b)
+            unicornhatmini.set_pixel(16 - y, 6 - x, r, g, b)
             # logging.debug(f"Y:{y} X:{x}\nR:{r}\nG:{g}\nB:{b}\nPixel Color:{pixel_color}")
 
     unicornhatmini.show()
