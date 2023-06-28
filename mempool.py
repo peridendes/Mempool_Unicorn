@@ -157,7 +157,7 @@ def convert_data_to_led_pixels(blocks):
             segment_lengths[i] += 1
 
         # Creating blank spots. may not be needed.
-        led_bar.extend([(0, 0, 0)] * (display_height - bar_length))
+        # led_bar.extend([(0, 0, 0)] * (display_height - bar_length))
 
         for i in range(display_height):
             led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
