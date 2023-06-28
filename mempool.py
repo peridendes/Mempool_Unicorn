@@ -60,7 +60,7 @@ def calculate_bar_length(block_size):
 
 # Function to adjust fee range to match bar length
 def form_fit_fees(fee_range, bar_length):
-    logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
+    logging.debug(f"Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
     while len(fee_range) != bar_length:
         # Calculate the indices of the values closest to the middle position
         middle_index = len(fee_range) // 2
@@ -91,7 +91,7 @@ def form_fit_fees(fee_range, bar_length):
             # Insert C between a and b in the fee_range
             fee_range.insert(b_index, C)
 
-        logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
+        logging.debug(f"{fee_range}")
 
     return fee_range
 
