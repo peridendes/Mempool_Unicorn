@@ -126,14 +126,16 @@ def convert_data_to_led_pixels(blocks):
 
         for i in range(segment_count):
             logging.debug(f"Line 127 {i}")
-            logging.debug(f"Segment Start: {segment_start}, Segment Start: {segment_end}")
+            logging.debug(f"{i} * {segment_lengths}")
             segment_start = i * segment_lengths
+            logging.debug(f"{segment_start}")
+            logging.debug(f"{segment_start} + {segment_lengths}")
             segment_end = segment_start + segment_lengths
-            logging.debug(f"Segment Start: {segment_start}, Segment Start: {segment_end}")
+            logging.debug(f"Segment End: {segment_end}")
 
             if i < remainder:
                 segment_end += 1
-                logging.debug(f"Segment Start: {segment_start}, Segment Start: {segment_end}")
+                logging.debug(f"Segment Start: {segment_start}, Segment End: {segment_end}")
 
             logging.debug(f"Before Line 139 {i}\nLED Bar: {led_bar}")
             led_bar.extend([segment_colors[i]] * (segment_end - segment_start))
