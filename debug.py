@@ -166,7 +166,7 @@ unicornhatmini.set_brightness(0.05)
 
 while True:
     blocks = get_mempool_data()
-    led_pixels = convert_data_to_led_pixels(blocks)
+    led_pixels = convert_data_to_led_pixels(reversed(blocks))
 
     for y, led_row in enumerate(led_pixels):
         for x, pixel_color in enumerate(led_row):
