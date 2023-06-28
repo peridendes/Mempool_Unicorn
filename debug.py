@@ -1,9 +1,12 @@
+import logging
 import math
 import os
 import requests
 import sys
 import time
-from unicornhatmini import UnicornHATMini
+# from unicornhatmini import UnicornHATMini
+
+logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
@@ -53,7 +56,9 @@ def get_mempool_data():
 # Function to calculate the length of the column by the block size
 def calculate_bar_length(block_size):
     bar_length = min(math.ceil(block_size / (2 * 1024 * 1024) * display_height), display_height)
+    # logging.debug(f"Block Size: {block_size}, Bar Length: {bar_length}")
     return bar_length
+
 
 # Function to calculate the segment colors based on fee range
 def calculate_segment_colors(fee_range):
@@ -94,49 +99,66 @@ def convert_data_to_led_pixels(blocks):
         fee_range = block['feeRange']
 
         segment_colors = calculate_segment_colors(fee_range)
+        logging.debug(f"Block {i}, Bar Length: {bar_length}\nFee Range: {fee_range}\nSegment Colors: {segment_colors}")
 
         led_bar = []
         segment_lengths = [bar_length // display_height] * display_height
         remainder = bar_length % display_height
+        logging.debug(f"Segment Lengths: {segment_lengths}, Remainder: {remainder}")
 
         for i in range(remainder):
             segment_lengths[i] += 1
+            logging.debug(f"Line 109 {i}\nSegment Lenghts: {segment_lengths}")
 
         # Creating blank spots. may not be needed.
         led_bar.extend([(0, 0, 0)] * (display_height - bar_length))
+        logging.debug(f"LED Bar: {led_bar}")
 
         for i in range(display_height):
             led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
-            
+            logging.debug(f"Line 116 {i}\nLED Bar: {led_bar}")
+
+        logging.debug(f"Before Line 121 {i}\nLED Pixels: {led_pixels}")
         led_pixels.append(led_bar)
+        logging.debug(f"After Line 121 {i}\nLED Pixels: {led_pixels}")
 
     return led_pixels
 
 # Main program
-unicornhatmini = UnicornHATMini()
+# unicornhatmini = UnicornHATMini()
 
-rotation = 180
-if len(sys.argv) > 1:
-    try:
-        rotation = int(sys.argv[1])
-    except ValueError:
-        print("Usage: {} <rotation>".format(sys.argv[0]))
-        sys.exit(1)
+# rotation = 180
+# if len(sys.argv) > 1:
+#     try:
+#         rotation = int(sys.argv[1])
+#     except ValueError:
+#         print("Usage: {} <rotation>".format(sys.argv[0]))
+#         sys.exit(1)
 
-unicornhatmini.set_rotation(rotation)
-display_width, display_height = unicornhatmini.get_shape()
+# unicornhatmini.set_rotation(rotation)
+# display_width, display_height = unicornhatmini.get_shape()
 
-# Too bright for the eye
-unicornhatmini.set_brightness(0.05)
+# # Too bright for the eye
+# unicornhatmini.set_brightness(0.05)
 
-while True:
-    blocks = get_mempool_data()
-    led_pixels = convert_data_to_led_pixels(blocks)
+# while True:
+#     blocks = get_mempool_data()
+#     led_pixels = convert_data_to_led_pixels(blocks)
 
-    for y, led_row in enumerate(led_pixels):
-        for x, pixel_color in enumerate(led_row):
-            r, g, b = pixel_color
-            unicornhatmini.set_pixel(y, x, r, g, b)
+#     for y, led_row in enumerate(led_pixels):
+#         for x, pixel_color in enumerate(led_row):
+#             r, g, b = pixel_color
+#             unicornhatmini.set_pixel(y, x, r, g, b)
 
-    unicornhatmini.show()
-    time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
+#     unicornhatmini.show()
+#     time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
+
+# Debug
+display_height = 7
+blocks = get_mempool_data()
+led_pixels = convert_data_to_led_pixels(blocks)
+
+for y, led_row in enumerate(led_pixels):
+    for x, pixel_color in enumerate(led_row):
+        r, g, b = pixel_color
+        logging.debug(f"Y:{y} X:{x}\nR:{r}\nG:{g}\nB:{b}\nPixel Color:{pixel_color}")
