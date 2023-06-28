@@ -143,10 +143,13 @@ def convert_data_to_led_pixels(blocks):
 
         segment_colors = calculate_segment_colors(fee_range)
 
+        logging.debug(f"Fee Range: {fee_range}")
+        logging.debug(f"Segment Colors Length: {len(segment_colors)}")  # Add this line
+
         for i in range(display_height):
+            logging.debug(f"i: {i}, len(segment_colors): {len(segment_colors)}")  # Add this line
             led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
 
-        logging.debug(f"Fee Range: {fee_range}")
         led_pixels.append(led_bar)
 
     return led_pixels
