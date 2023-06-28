@@ -165,7 +165,7 @@ def convert_data_to_led_pixels(blocks):
         # Proceed with coloring the segments as before
         for i in range(segment_count):
             logging.debug(f"Line 175 {i}")
-            segment_start = sum(segment_lengths[:i])
+            segment_start = sum(segment_lengths[:i+1])
             #segment_start = i * segment_lengths
             logging.debug(f"{segment_start}")
             segment_end = segment_start + segment_lengths[i]
