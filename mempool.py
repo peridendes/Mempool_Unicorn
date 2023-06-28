@@ -55,6 +55,29 @@ def calculate_bar_length(block_size):
     bar_length = min(math.ceil(block_size / (2 * 1024 * 1024) * display_height), display_height)
     return bar_length
 
+# Function to reduce fee range by 1
+def handle_long_fee_range(fee_range):
+    # Calculate the indices of the values closest to the middle position
+    middle_index = len(fee_range) // 2
+    a_index = middle_index - 1
+    b_index = middle_index + 1
+
+    # Find the values closest to the middle position
+    a = fee_range[a_index]
+    b = fee_range[b_index]
+
+    # Calculate the average
+    C = (a + b) / 2
+
+    # Remove a and b from fee_range
+    fee_range.pop(b_index)
+    fee_range.pop(a_index)
+
+    # Insert C at the middle position
+    fee_range.insert(middle_index, C)
+
+    return fee_range
+
 # Function to calculate the segment colors based on fee range
 def calculate_segment_colors(fee_range):
     segment_colors = []
@@ -92,6 +115,10 @@ def convert_data_to_led_pixels(blocks):
     for i, block in enumerate(blocks):
         bar_length = calculate_bar_length(block['blockSize'])
         fee_range = block['feeRange']
+
+        if len(fee_range) > bar_length:
+            fee_range = handle_long_fee_range(fee_range)
+            logging.debug(f"Block {i}, Bar Length: {bar_length}, Fee Segments: {len(fee_range)}")
 
         segment_colors = calculate_segment_colors(fee_range)
 
