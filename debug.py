@@ -189,7 +189,7 @@ while True:
     for y, led_row in enumerate(led_pixels):
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
-            unicornhatmini.set_pixel(16 - y, 6 - x, r, g, b)
+            unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
             # logging.debug(f"Y:{y} X:{x}\nR:{r}\nG:{g}\nB:{b}\nPixel Color:{pixel_color}")
 
     unicornhatmini.show()
