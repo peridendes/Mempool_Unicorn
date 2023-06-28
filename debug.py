@@ -83,9 +83,11 @@ def calculate_segment_colors(fee_range):
             r = 255
             g = 0
             b = int(255 * (max(fee_range) - fee) / (max(fee_range) - 60))
+        logging.debug(f"Fee: {fee}")
 
         segment_colors.append((r, g, b))
 
+    logging.debug(f"Segment Colors: {segment_colors}")
     return segment_colors
 
 # Function to reduce fee range by 1
@@ -146,7 +148,7 @@ def convert_data_to_led_pixels(blocks):
         logging.debug(f"Fee Range: {fee_range}")
         logging.debug(f"Segment Colors Length: {len(segment_colors)}")  # Add this line
 
-        for i in range(bar_length):
+        for i in range(display_height):
             logging.debug(f"i: {i}, len(segment_colors): {len(segment_colors)}")  # Add this line
             led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
 
