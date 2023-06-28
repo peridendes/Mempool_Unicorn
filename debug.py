@@ -138,33 +138,34 @@ def convert_data_to_led_pixels(blocks):
 
             # Calculate the step size to evenly distribute the remaining values
             # Subtract 2 from bar_length to keep min & max fee values
-            step_size = (len(fee_range) - drop_count) / (bar_length - 2)
+            # step_size = (len(fee_range) - drop_count) / (bar_length - 2)
 
             # Calculate the indices of the feeRange to keep
-            indices = [int(i * step_size + drop_start) for i in range(bar_length - 2)]  # Subtract 2 for the upper and lower bounds
+            # indices = [int(i * step_size + drop_start) for i in range(bar_length - 2)]  # Subtract 2 for the upper and lower bounds
 
             # Create a new feeRange with the selected indices and add the upper and lower bounds
-            new_fee_range = [min(fee_range), max(fee_range)] + [fee_range[i] for i in indices]
+            # new_fee_range = [min(fee_range), max(fee_range)] + [fee_range[i] for i in indices]
+            new_fee_range = [min(fee_range), max(fee_range)] + fee_range[drop_start:-drop_end]
             logging.debug(f"{new_fee_range}")
 
-            # Recalculate the segment count and lengths
             segment_count = bar_length
-            logging.debug(f"Segment Count: {segment_count}")
+            logging.debug(f"{segment_count} = {bar_length}")
             segment_lengths = [bar_length // segment_count] * segment_count
-            logging.debug(f"Segment Lengths: {segment_lengths}")
+            logging.debug(f"{bar_length} // {segment_count} * {segment_count} = {segment_lengths}")
             remainder = bar_length % segment_count
-            logging.debug(f"Remainder: {remainder}")
+            logging.debug(f"{bar_length} % {segment_count} = {remainder}")
 
             # Distribute the remainder pixels evenly across the segments
             for i in range(remainder):
                 segment_lengths[i] += 1
+                logging.debug(f"{segment_lengths}")
 
             # Recalculate the segment colors based on the new feeRange
             segment_colors = calculate_segment_colors(new_fee_range)
 
         # Proceed with coloring the segments as before
         for i in range(segment_count):
-            logging.debug(f"Line 175 {i}")
+            logging.debug(f"Line 168 {i}")
             segment_start = sum(segment_lengths[:i+1])
             #segment_start = i * segment_lengths
             logging.debug(f"{segment_start}")
