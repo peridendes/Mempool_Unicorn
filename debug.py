@@ -5,6 +5,7 @@ import requests
 import signal
 import sys
 import time
+from PIL import Image, ImageDraw, ImageFont
 from unicornhatmini import UnicornHATMini
 
 logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
