@@ -4,6 +4,7 @@ import os
 import requests
 import sys
 import time
+from PIL import Image, ImageDraw, ImageFont
 from unicornhatmini import UnicornHATMini
 
 # Function to retrieve mempool data from the API
@@ -54,7 +55,7 @@ def get_mempool_data():
 
     return None
 
-# Function to retrieve mempool data from the API
+# Function to retrieve block data from the API
 def get_block_data():
     node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
     
@@ -100,6 +101,40 @@ def get_block_data():
         print("No MEMPOOL_NODE_ADDRESS found. Exiting...")
 
     return None
+
+# Function for new block alert
+def new_block_alert(block):
+    # Load a 5x7 pixel font
+    font = ImageFont.truetype("5x7.ttf", 8)
+
+    text = f"New Block {block['height']}"
+
+    # Measure the width of text
+    text_width = font.getsize(text)
+
+    # Create a new PIL image big enough to fit the text
+    image = Image.new('P', (text_width + display_width + display_width, display_height), 0)
+    draw = ImageDraw.Draw(image)
+
+    # Draw the text into the image
+    draw.text((display_width, -1), text, font=font, fill=255)
+
+    offset_x = 0
+
+    while (offset_x + display_width <= image.size[0]):
+        for y in range(display_height):
+            for x in range(display_width):
+                if image.getpixel((x + offset_x, y)) == 255:
+                    unicornhatmini.set_pixel(x, y, 255, 255, 255)
+                else:
+                    unicornhatmini.set_pixel(x, y, 0, 0, 0)
+
+        offset_x += 1
+
+        unicornhatmini.show()
+        time.sleep(0.1)
+
+    return 0
 
 # Function to calculate the length of the column by the block size
 def calculate_bar_length(block_size):
@@ -188,6 +223,7 @@ def convert_mempool_to_led_pixels(mempool):
     # LED Pixel Matrix
     return led_pixels
 
+# Function to convert block data to LED pixels
 def convert_block_data_to_led_pixels(blocks):
     led_pixels = []
 
@@ -229,7 +265,13 @@ while True:
 
     # First run and whenever a new block is found
     if blocks[0]['height'] > latest_block:
+        latest_block = blocks[0]['height']
+
         block_pixels = convert_block_data_to_led_pixels(blocks)
+        
+        # New block found
+        if latest_block != 0:
+            new_block_alert(block[0]) 
 
         # Refresh the entire screen to 0, 0, 0 (off)
         unicornhatmini.clear()
@@ -239,10 +281,7 @@ while True:
             for x, pixel_color in enumerate(led_row):
                 r, g, b = pixel_color
                 # Set the pixel for the right 8 columns at the corresponding position
-                unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
-        
-        # Track the most recent block mined
-        latest_block = blocks[0]['height']   
+                unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)   
             
     # Pull mempool data and change to LED values
     mempool = get_mempool_data()
