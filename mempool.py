@@ -1,4 +1,3 @@
-import logging
 import math
 import numpy as np
 import os
@@ -6,8 +5,6 @@ import requests
 import sys
 import time
 from unicornhatmini import UnicornHATMini
-
-logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
@@ -71,8 +68,6 @@ def form_fit_fees(fee_range, bar_length):
     # Use linear interpolation to estimate new values based on the old fee range
     fee_range = np.interp(x_new, x_old, fee_range).tolist()
 
-    logging.debug(f"{fee_range}")
-
     return fee_range
 
 # Function to calculate the segment colors based on fee range
@@ -111,7 +106,6 @@ def convert_data_to_led_pixels(blocks):
 
     for i, block in enumerate(blocks):
         bar_length = calculate_bar_length(block['blockSize'])
-        logging.debug(f"Block: {i}, Bar Length: {bar_length}\n{block['feeRange']}")
         fee_range = form_fit_fees(block['feeRange'], bar_length)
 
         segment_colors = calculate_segment_colors(fee_range)
