@@ -70,7 +70,7 @@ def form_fit_fees(fee_range, bar_length):
             middle_index += 1
 
         a_index = middle_index
-        b_index = middle_index + 1
+        b_index = middle_index - 1
 
         # Find the values closest to the middle position
         a = fee_range[a_index]
@@ -89,7 +89,7 @@ def form_fit_fees(fee_range, bar_length):
 
         if len(fee_range) < bar_length:
             # Insert C between a and b in the fee_range
-            fee_range.insert(b_index, C)
+            fee_range.insert(a_index, C)
 
         logging.debug(f"{fee_range}")
 
