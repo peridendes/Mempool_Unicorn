@@ -1,5 +1,4 @@
 import math
-import numpy as np
 import os
 import requests
 import sys
@@ -155,15 +154,6 @@ def calculate_bar_length(block_size):
 # Function to adjust fee range to match bar length
 def form_fit_fees(fee_range, bar_length):
 
-    # Create an array of indices evenly spaced within the range of the fee segments
-    x_old = np.linspace(0, len(fee_range) - 1, len(fee_range))
-
-    # Create an array of indices evenly spaced within the desired bar length
-    x_new = np.linspace(0, len(fee_range) - 1, bar_length)
-
-    # Use linear interpolation to estimate new values based on the old fee range
-    x_fee_range = np.interp(x_new, x_old, fee_range).tolist()
-
     old_length = len(fee_range)
     new_length = bar_length
 
@@ -172,8 +162,6 @@ def form_fit_fees(fee_range, bar_length):
 
     # Calculate the new fee range using linear interpolation
     fee_range = [fee_range[math.floor(i * scaling_factor)] for i in range(new_length)]
-
-    
 
     return fee_range
 
