@@ -163,7 +163,8 @@ def convert_block_data_to_led_pixels(blocks):
 
     for block in blocks:
         bar_length = calculate_bar_length(block['size'])
-        medianFee = [block['extras']['medianFee']]
+        medianFee = int([block['extras']['medianFee']])
+
         led_color = fee_colors(medianFee)
 
         # Create a column of LED pixels with the same color       
