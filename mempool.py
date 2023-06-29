@@ -57,6 +57,25 @@ def get_mempool_data():
 # Function to retrieve mempool data from the API
 def get_block_data():
     node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
+    
+    if not node_address:
+        # Check if the .env file exists and load the environment variables from it
+        if os.path.exists(".env"):
+            with open(".env", "r") as f:
+                for line in f:
+                    key, value = line.strip().split("=")
+                    os.environ[key] = value
+            node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
+
+        # Failed to find value in .env file
+        if not node_address:
+            node_address = input("Enter your mempool.space self-hosted node address: ")
+            os.environ["MEMPOOL_NODE_ADDRESS"] = node_address
+
+            # Save the environment variable to the user's machine
+            with open(".env", "w") as f:
+                f.write(f"MEMPOOL_NODE_ADDRESS={node_address}\n")
+
     if node_address:
         url = f"{node_address}/api/v1/blocks"
         max_retries = 3
@@ -196,28 +215,35 @@ unicornhatmini.set_brightness(0.1)
 latest_block = 0
 
 while True:
-    mempool = get_mempool_data()
-    mempool_pixels = convert_mempool_to_led_pixels(mempool)
-
-    # Set the LED pixels for the mempool
-    for y, led_row in enumerate(mempool_pixels):
-        for x, pixel_color in enumerate(led_row):
-            r, g, b = pixel_color
-            unicornhatmini.set_pixel(7 - y, 6 - x, r, g, b)
-
     blocks = get_block_data()
-    if blocks[0]['height'] > latest_block:
-        block_pixels = convert_block_data_to_led_pixels(blocks)
 
-        # Set the LED pixels for the blocks
+    # First run and whenever a new block is found
+    if blocks[0]['height'] > latest_block:
+        # Refresh the entire screen
+        unicornhatmini.clear()
+
+        # Update Block Pixels
+        block_pixels = convert_block_data_to_led_pixels(blocks)
         for y, led_row in enumerate(block_pixels):
             for x, pixel_color in enumerate(led_row):
                 r, g, b = pixel_color
                 # Set the pixel for the right 8 columns at the corresponding position
-                unicornhatmini.set_pixel(9 + y, 6 - x, r, g, b)
+                unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
         
         # Track the most recent block mined
         latest_block = blocks[0]['height']
 
+    else:
+        # Every run refresh mempool pixels
+        mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(8)]
+            
+    # Update Mempool Pixels
+    mempool = get_mempool_data()
+    mempool_pixels = convert_mempool_to_led_pixels(mempool)
+    for y, led_row in enumerate(mempool_pixels):
+        for x, pixel_color in enumerate(led_row):
+            r, g, b = pixel_color
+            unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
+
     unicornhatmini.show()
-    time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
+    time.sleep(15)  # Wait for 15 seconds before refreshing the data and screen
