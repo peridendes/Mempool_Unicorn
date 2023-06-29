@@ -208,6 +208,7 @@ while True:
     for y, led_row in enumerate(mempool_pixels):
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
+            unicornhatmini.clear(7 - y, 6 - x)
             unicornhatmini.set_pixel(7 - y, 6 - x, r, g, b)
             logging.debug(f"Mempool\nY:{y}, X:{x}, R:{r}, G:{g}, B:{b}")
 
@@ -219,6 +220,7 @@ while True:
         for y, led_row in enumerate(block_pixels):
             for x, pixel_color in enumerate(led_row):
                 r, g, b = pixel_color
+                unicornhatmini.clear(9 + y, 6 - x)
                 # Set the pixel for the right 8 columns at the corresponding position
                 unicornhatmini.set_pixel(9 + y, 6 - x, r, g, b)
                 logging.debug(f"Blocks\nY:{y}, X:{x}, R:{r}, G:{g}, B:{b}")
