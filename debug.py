@@ -287,8 +287,7 @@ unicornhatmini.set_brightness(0.1)
 latest_block = 0
 
 # Main Program Loop
-while running:
-
+try:
     while True:
         blocks = get_block_data()
 
@@ -326,8 +325,9 @@ while running:
         unicornhatmini.show()
         time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
 
-unicornhatmini.clear()
-unicornhatmini.show()
+except KeyboardInterrupt:
+    unicornhatmini.clear()
+    unicornhatmini.show()
 
-# Exit the program
-sys.exit(0)
+    # Exit the program
+    sys.exit(0)
