@@ -205,7 +205,7 @@ while True:
     for y, led_row in enumerate(mempool_pixels):
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
-            unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
+            unicornhatmini.set_pixel(9 - y, 6 - x, r, g, b)
 
     blocks = get_block_data()
     block_pixels = convert_block_data_to_led_pixels(blocks)
