@@ -61,7 +61,7 @@ def calculate_bar_length(block_size):
 
 # Function to adjust fee range to match bar length
 def form_fit_fees(fee_range, bar_length):
-    
+    logging.debug(f"{fee_range}")
     # Create an array of indices evenly spaced within the range of the fee segments
     x_old = np.linspace(0, len(fee_range) - 1, len(fee_range))
 
@@ -145,6 +145,7 @@ def convert_data_to_led_pixels(blocks):
 
     for i, block in enumerate(blocks):
         bar_length = calculate_bar_length(block['blockSize'])
+        logging.debug(f"Block: {i}")
         fee_range = form_fit_fees(block['feeRange'], bar_length)
 
         segment_colors = calculate_segment_colors(fee_range)
