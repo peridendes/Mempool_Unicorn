@@ -126,8 +126,8 @@ def rgb_fees(fee, data_type):
         else:
             # Red to White
             r = 255
-            g = int(255 * (max(fee) - fee) / (max(fee) - 60))
-            b = int(255 * (max(fee) - fee) / (max(fee) - 60))
+            g = int(255 * max(((fee - 500) / 500), 1))
+            b = int(255 * max(((fee - 500) / 500), 1))
     else:
         # Blue to Red 
         r = int(255 * min(math.pow((fee / 60), 2), 1)) # exponential growth
