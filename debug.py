@@ -195,7 +195,7 @@ unicornhatmini.set_rotation(rotation)
 display_width, display_height = unicornhatmini.get_shape()
 
 # Too bright for the eye
-unicornhatmini.set_brightness(0.05)
+unicornhatmini.set_brightness(0.1)
 
 # Track the most recent block mined
 latest_block = 0
@@ -209,6 +209,7 @@ while True:
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
             unicornhatmini.set_pixel(7 - y, 6 - x, r, g, b)
+            logging.debug(f"Mempool\nY:{y}, X:{x}, R:{r}, G:{g}, B:{b}")
 
     blocks = get_block_data()
     if blocks[0]['height'] > latest_block:
@@ -220,6 +221,7 @@ while True:
                 r, g, b = pixel_color
                 # Set the pixel for the right 8 columns at the corresponding position
                 unicornhatmini.set_pixel(9 + y, 6 - x, r, g, b)
+                logging.debug(f"Blocks\nY:{y}, X:{x}, R:{r}, G:{g}, B:{b}")
         
         # Track the most recent block mined
         latest_block = blocks[0]['height']
