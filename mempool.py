@@ -113,7 +113,7 @@ def new_block_alert(block):
     text_width = font.getsize(text)
 
     # Create a new PIL image big enough to fit the text
-    image = Image.new('P', (text_width + display_width + display_width, display_height), 0)
+    image = Image.new('P', (text_width[0] + display_width + display_width, display_height), 0)
     draw = ImageDraw.Draw(image)
 
     # Draw the text into the image
