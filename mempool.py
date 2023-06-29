@@ -8,7 +8,9 @@ from unicornhatmini import UnicornHATMini
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
+    # Attempt to load Environment Variable
     node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
+
     if not node_address:
         # Check if the .env file exists and load the environment variables from it
         if os.path.exists(".env"):
@@ -18,6 +20,7 @@ def get_mempool_data():
                     os.environ[key] = value
             node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
 
+        # Failed to find value in .env file
         if not node_address:
             node_address = input("Enter your mempool.space self-hosted node address: ")
             os.environ["MEMPOOL_NODE_ADDRESS"] = node_address
@@ -37,9 +40,37 @@ def get_mempool_data():
                 response = requests.get(url)
                 response.raise_for_status()
                 data = response.json()
-                blocks = data[:8]  # Retrieve 8 blocks from the API
+                blocks = data[:8]  # Retrieve 8 blocks
                 return blocks
             except (requests.exceptions.RequestException, ValueError) as e:
+                print(f"Error occurred: {e}")
+                print("Retrying after 15 seconds...")
+                time.sleep(retry_interval)
+                retries += 1
+
+        print("Max retries exceeded. Exiting...")
+    else:
+        print("No MEMPOOL_NODE_ADDRESS found. Exiting...")
+
+    return None
+
+# Function to retrieve mempool data from the API
+def get_block_data():
+    node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
+    if node_address:
+        url = f"{node_address}/api/v1/blocks"
+        max_retries = 3
+        retry_interval = 15  # seconds
+        retries = 0
+
+        while retries < max_retries:
+            try:
+                response = requests.get(url)
+                response.raise_for_status()
+                data = response.json()
+                blocks = data[:8]  # Retrieve 8 blocks
+                return blocks
+            except requests.exceptions.RequestException as e:
                 print(f"Error occurred: {e}")
                 print("Retrying after 15 seconds...")
                 time.sleep(retry_interval)
@@ -70,8 +101,8 @@ def form_fit_fees(fee_range, bar_length):
 
     return fee_range
 
-# Function to calculate the segment colors based on fee range
-def calculate_segment_colors(fee_range):
+# Function to calculate the colors based on fee range
+def fee_colors(fee_range):
     segment_colors = []
 
     for fee in fee_range:
@@ -100,15 +131,27 @@ def calculate_segment_colors(fee_range):
 
     return segment_colors
 
+# Function to calculate the colors based on block size
+def block_color(size):
+    bar_color = []
+    # Blue to Purple as block size increases
+    r = int(255 * min(math.ceil(size / (2 * 1024 * 1024)), 1))
+    g = 0
+    b = 255
+    
+    bar_color.append((r, g, b))
+
+    return bar_color
+
 # Function to convert mempool data to LED pixels
-def convert_data_to_led_pixels(blocks):
+def convert_mempool_to_led_pixels(mempool):
     led_pixels = []
 
-    for i, block in enumerate(blocks):
+    for i, block in enumerate(mempool):
         bar_length = calculate_bar_length(block['blockSize'])
         fee_range = form_fit_fees(block['feeRange'], bar_length)
 
-        segment_colors = calculate_segment_colors(fee_range)
+        segment_colors = fee_colors(fee_range)
 
         led_bar = []
         segment_lengths = [bar_length // display_height] * display_height
@@ -120,6 +163,22 @@ def convert_data_to_led_pixels(blocks):
         for i in range(display_height):
             led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
             
+        led_pixels.append(led_bar)
+
+    return led_pixels
+
+def convert_block_data_to_led_pixels(blocks):
+    led_pixels = []
+    size = block['size']
+
+    for i, block in enumerate(blocks):
+        bar_length = calculate_bar_length(block['size'])
+        led_color = block_color(size)
+
+        # Create a column of LED pixels with the same color       
+        led_bar = [led_color] * bar_length
+
+        # Append the pixel data to led_pixels
         led_pixels.append(led_bar)
 
     return led_pixels
@@ -142,13 +201,24 @@ display_width, display_height = unicornhatmini.get_shape()
 unicornhatmini.set_brightness(0.05)
 
 while True:
-    blocks = get_mempool_data()
-    led_pixels = convert_data_to_led_pixels(blocks)
+    mempool = get_mempool_data()
+    mempool_pixels = convert_mempool_to_led_pixels(mempool)
 
-    for y, led_row in enumerate(led_pixels):
+    # Set the LED pixels for the mempool
+    for y, led_row in enumerate(mempool_pixels):
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
             unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
+
+    blocks = get_block_data()
+    block_pixels = convert_block_data_to_led_pixels(blocks)
+
+    # Set the LED pixels for the blocks
+    for y, led_row in enumerate(block_pixels):
+        for x, pixel_color in enumerate(led_row):
+            r, g, b = pixel_color
+            # Set the pixel for the right 8 columns at the corresponding position
+            unicornhatmini.set_pixel(8 + y, 6 - x, r, g, b)
 
     unicornhatmini.show()
     time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
