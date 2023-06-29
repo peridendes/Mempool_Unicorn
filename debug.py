@@ -10,17 +10,6 @@ from unicornhatmini import UnicornHATMini
 
 logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
-# Flag variable to indicate if the loop should continue running
-running = True
-
-# Handler for the keyboard interrupt signal (Ctrl+C)
-def signal_handler(sig, frame):
-    global running
-    running = False
-
-# Set the signal handler for the keyboard interrupt signal
-signal.signal(signal.SIGINT, signal_handler) # Ctrl+C
-
 # Function to retrieve mempool data from the API
 def get_mempool_data():
     # Attempt to load Environment Variable
@@ -286,50 +275,39 @@ unicornhatmini.set_brightness(0.1)
 latest_block = 0
 
 # Main Program Loop
-while running:
-    try:
-        while True:
-            blocks = get_block_data()
+while True:
+    blocks = get_block_data()
 
-            # First run and whenever a new block is found
-            if blocks[0]['height'] > latest_block:
-                block_pixels = convert_block_data_to_led_pixels(blocks)
-                
-                # New block found
-                if latest_block != 0:
-                    new_block_alert(blocks[0]) 
-
-                # Refresh the entire screen to 0, 0, 0 (off)
-                unicornhatmini.clear()
-
-                # Set the LED pixels for the blocks
-                for y, led_row in enumerate(block_pixels):
-                    for x, pixel_color in enumerate(led_row):
-                        r, g, b = pixel_color
-                        # Set the pixel for the right 8 columns at the corresponding position
-                        unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
-                
-                # Update tracking of most recent block mined
-                latest_block = blocks[0]['height']
-                    
-            # Pull mempool data and change to LED values
-            mempool = get_mempool_data()
-            mempool_pixels = convert_mempool_to_led_pixels(mempool)
-
-            # Set the LED pixels for the mempool
-            for y, led_row in enumerate(mempool_pixels):
-                for x, pixel_color in enumerate(led_row):
-                    r, g, b = pixel_color
-                    unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
-
-            unicornhatmini.show()
-            time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
+    # First run and whenever a new block is found
+    if blocks[0]['height'] > latest_block:
+        block_pixels = convert_block_data_to_led_pixels(blocks)
     
-unicornhatmini.clear()
-unicornhatmini.show()
+        # New block found
+        if latest_block != 0:
+            new_block_alert(blocks[0]) 
 
-# Exit the program
-sys.exit(0)
+        # Refresh the entire screen to 0, 0, 0 (off)
+        unicornhatmini.clear()
+
+        # Set the LED pixels for the blocks
+        for y, led_row in enumerate(block_pixels):
+            for x, pixel_color in enumerate(led_row):
+                r, g, b = pixel_color
+                # Set the pixel for the right 8 columns at the corresponding position
+                unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
+                
+        # Update tracking of most recent block mined
+        latest_block = blocks[0]['height']
+                    
+    # Pull mempool data and change to LED values
+    mempool = get_mempool_data()
+    mempool_pixels = convert_mempool_to_led_pixels(mempool)
+
+    # Set the LED pixels for the mempool
+    for y, led_row in enumerate(mempool_pixels):
+        for x, pixel_color in enumerate(led_row):
+            r, g, b = pixel_color
+            unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
+
+    unicornhatmini.show()
+    time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
