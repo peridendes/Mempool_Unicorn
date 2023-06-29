@@ -129,10 +129,10 @@ def rgb_fees(fee, data_type):
             g = int(255 * (max(fee) - fee) / (max(fee) - 60))
             b = int(255 * (max(fee) - fee) / (max(fee) - 60))
     else:
-        # Green to Red 
-        r = int(255 * min((fee / 60), 1))
-        g = int(255 * max(((60 - fee) / 60), 0))
-        b = 0
+        # Blue to Red 
+        r = int(255 * min(math.pow((fee / 60), 2), 1)) # exponential growth
+        g = 0
+        b = int(255 * max(math.pow(((60 - fee) / 60, 0.5)), 0)) # exponential shrink
 
     return r, g, b
 
