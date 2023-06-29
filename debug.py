@@ -132,7 +132,7 @@ def rgb_fees(fee, data_type):
         # Blue to Red 
         r = int(255 * min(math.pow((fee / 60), 2), 1)) # exponential growth
         g = 0
-        b = int(255 * max(math.pow(((60 - fee) / 60, 0.5)), 0)) # exponential shrink
+        b = int(255 * max(math.pow(((60 - fee) / 60), 0.5), 0)) # exponential shrink
 
     return r, g, b
 
