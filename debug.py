@@ -60,6 +60,25 @@ def get_mempool_data():
 # Function to retrieve mempool data from the API
 def get_block_data():
     node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
+    
+    if not node_address:
+        # Check if the .env file exists and load the environment variables from it
+        if os.path.exists(".env"):
+            with open(".env", "r") as f:
+                for line in f:
+                    key, value = line.strip().split("=")
+                    os.environ[key] = value
+            node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
+
+        # Failed to find value in .env file
+        if not node_address:
+            node_address = input("Enter your mempool.space self-hosted node address: ")
+            os.environ["MEMPOOL_NODE_ADDRESS"] = node_address
+
+            # Save the environment variable to the user's machine
+            with open(".env", "w") as f:
+                f.write(f"MEMPOOL_NODE_ADDRESS={node_address}\n")
+
     if node_address:
         url = f"{node_address}/api/v1/blocks"
         max_retries = 3
