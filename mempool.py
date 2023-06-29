@@ -190,7 +190,7 @@ unicornhatmini.set_rotation(rotation)
 display_width, display_height = unicornhatmini.get_shape()
 
 # Too bright for the eye
-unicornhatmini.set_brightness(0.05)
+unicornhatmini.set_brightness(0.1)
 
 # Track the most recent block mined
 latest_block = 0
