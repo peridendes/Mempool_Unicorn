@@ -146,7 +146,7 @@ def new_block_alert(block):
         time.sleep(0.05)
 
     return 0
-ß
+
 # Function to calculate the length of the column by the block size
 def calculate_bar_length(block_size):
     bar_length = min(math.ceil(block_size / (2 * 1024 * 1024) * display_height), display_height)
