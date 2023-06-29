@@ -109,7 +109,7 @@ def fee_colors(fee_range):
     segment_colors = []
 
     if isinstance(fee_range, int):
-        fee_range = [fee_range] # Convert integer to a single-element list
+        fee_range = [(fee_range,)] # Convert integer to a tuple
 
     for fee in fee_range:
         if fee <= 10:
