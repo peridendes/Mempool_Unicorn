@@ -271,7 +271,7 @@ while True:
         
         # New block found
         if latest_block != 0:
-            new_block_alert(block[0]) 
+            new_block_alert(blocks[0]) 
 
         # Refresh the entire screen to 0, 0, 0 (off)
         unicornhatmini.clear()
