@@ -57,7 +57,7 @@ def get_mempool_data():
 
     return None
 
-# Function to retrieve mempool data from the API
+# Function to retrieve block data from the API
 def get_block_data():
     node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
     
@@ -104,6 +104,51 @@ def get_block_data():
 
     return None
 
+# Function for new block alert
+def new_block_alert(block):
+    height = block['height']
+    reward = block['extras']['reward']
+    reward = reward / 100000000  # Convert fee to whole bitcoin
+    reward = round(reward, 3)  # Round fee to 3 decimal places
+    tx_count = block['tx_count']
+    median_fee = block['extras']['medianFee']
+
+    # Text to scroll when new block is mined
+    text = f"    New Block {height}    Reward: {reward} BTC    Tx Count: {tx_count}    Median Fee: ~{median_fee} sat/vB    "
+
+    # Load a 5x7 pixel font
+    font = ImageFont.truetype("5x7.ttf", 8)
+    
+    # Measure the width of text
+    text_width = font.getsize(text)
+
+    # Create a new PIL image big enough to fit the text
+    image = Image.new('P', (text_width[0] + display_width + display_width, display_height), 0)
+    draw = ImageDraw.Draw(image)
+    
+    # Draw the text into the image
+    draw.text((display_width, -1), text, font=font, fill=255)
+
+    # Align off right edge on display
+    offset_x = 0
+
+    # Draw text from image based
+    while (offset_x + display_width <= image.size[0]):
+        for y in range(display_height):
+            for x in range(display_width):
+                if image.getpixel((x + offset_x, y)) == 255:
+                    unicornhatmini.set_pixel(x, y, 242, 169, 0) # Bitcoin Orange 
+                else:
+                    unicornhatmini.set_pixel(x, y, 0, 0, 0)
+
+        # Scroll
+        offset_x += 1
+
+        unicornhatmini.show()
+        time.sleep(0.05)
+
+    return 0
+
 # Function to calculate the length of the column by the block size
 def calculate_bar_length(block_size):
     bar_length = min(math.ceil(block_size / (2 * 1024 * 1024) * display_height), display_height)
@@ -119,9 +164,20 @@ def form_fit_fees(fee_range, bar_length):
     x_new = np.linspace(0, len(fee_range) - 1, bar_length)
 
     # Use linear interpolation to estimate new values based on the old fee range
-    fee_range = np.interp(x_new, x_old, fee_range).tolist()
+    x_fee_range = np.interp(x_new, x_old, fee_range).tolist()
 
-    # logging.debug(f"{fee_range}")
+    old_length = len(fee_range)
+    new_length = bar_length
+
+    # Calculate the scaling factor for linear interpolation
+    scaling_factor = (old_length - 1) / (new_length - 1)
+
+    # Calculate the new fee range using linear interpolation
+    fee_range = [fee_range[math.floor(i * scaling_factor)] for i in range(new_length)]
+
+    logging.debug(f"{x_fee_range}")
+    logging.debug(f"{fee_range}")
+
     return fee_range
 
 # Function to calculate the colors based on fee range
@@ -183,8 +239,9 @@ def convert_mempool_to_led_pixels(mempool):
             led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
             
         # Add Empty pixels to fill column to display edge
-        while len(led_bar) < display_height:
-            led_bar.append((0, 0, 0))
+        led_bar.extend([(0, 0, 0)] * (display_height - len(led_bar)))
+        # while len(led_bar) < display_height:
+        #     led_bar.append((0, 0, 0))
 
         # Append the bar to LED Pixel Matrix
         led_pixels.append(led_bar)
@@ -192,6 +249,7 @@ def convert_mempool_to_led_pixels(mempool):
     # LED Pixel Matrix
     return led_pixels
 
+# Function to convert block data to LED pixels
 def convert_block_data_to_led_pixels(blocks):
     led_pixels = []
 
@@ -199,7 +257,6 @@ def convert_block_data_to_led_pixels(blocks):
         bar_length = calculate_bar_length(block['size'])
         medianFee = block['extras']['medianFee']
         led_color = rgb_fees(medianFee, "block")
-        logging.debug(f"Bar Length: {bar_length}, Color: {led_color}")
 
         # Create a column of LED pixels with the same color       
         led_bar = [led_color] * bar_length
@@ -235,6 +292,10 @@ while True:
     # First run and whenever a new block is found
     if blocks[0]['height'] > latest_block:
         block_pixels = convert_block_data_to_led_pixels(blocks)
+        
+        # New block found
+        if latest_block != 0:
+            new_block_alert(blocks[0]) 
 
         # Refresh the entire screen to 0, 0, 0 (off)
         unicornhatmini.clear()
@@ -245,11 +306,9 @@ while True:
                 r, g, b = pixel_color
                 # Set the pixel for the right 8 columns at the corresponding position
                 unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
-                logging.debug(f"Blocks\nY:{y}, X:{x}, R:{r}, G:{g}, B:{b}")
         
-        # Track the most recent block mined
+        # Update tracking of most recent block mined
         latest_block = blocks[0]['height']
-        logging.debug(f"Block Found! {blocks[0]['height']}")    
             
     # Pull mempool data and change to LED values
     mempool = get_mempool_data()
@@ -260,8 +319,6 @@ while True:
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
             unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
-            logging.debug(f"Mempool\nY:{y}, X:{x}, R:{r}, G:{g}, B:{b}")
-
 
     unicornhatmini.show()
     time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
