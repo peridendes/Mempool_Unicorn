@@ -210,8 +210,8 @@ while True:
     #         r, g, b = pixel_color
     #         unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
 
-    # blocks = get_block_data()
-    # block_pixels = convert_block_data_to_led_pixels(blocks)
+    blocks = get_block_data()
+    block_pixels = convert_block_data_to_led_pixels(blocks)
 
     # Set the LED pixels for the blocks
     for y, led_row in enumerate(block_pixels):
