@@ -191,7 +191,7 @@ display_width, display_height = unicornhatmini.get_shape()
 unicornhatmini.set_brightness(0.05)
 
 while True:
-    # mempool = get_mempool_data()
+    mempool = get_mempool_data()
     # mempool_pixels = convert_mempool_to_led_pixels(mempool)
 
     # # Set the LED pixels for the mempool
