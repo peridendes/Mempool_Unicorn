@@ -102,6 +102,7 @@ def form_fit_fees(fee_range, bar_length):
     # Use linear interpolation to estimate new values based on the old fee range
     fee_range = np.interp(x_new, x_old, fee_range).tolist()
 
+    logging.debug(f"{fee_range}")
     return fee_range
 
 # Function to calculate the colors based on fee range
@@ -109,7 +110,7 @@ def fee_colors(fee_range):
     segment_colors = []
 
     if isinstance(fee_range, int):
-        fee_range = [(fee_range,)] # Convert integer to a tuple
+        fee_range = [fee_range] # Convert integer to a single-element list
 
     for fee in fee_range:
         if fee <= 10:
