@@ -20,7 +20,6 @@ def signal_handler(sig, frame):
 
 # Set the signal handler for the keyboard interrupt signal
 signal.signal(signal.SIGINT, signal_handler) # Ctrl+C
-signal.signal(signal.SIGTSTP, signal_handler) # Ctrl+Z
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
