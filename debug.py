@@ -131,18 +131,6 @@ def fee_colors(fee_range):
 
     return segment_colors
 
-# Function to calculate the colors based on block size
-def block_color(size):
-    bar_color = []
-    # Blue to Purple as block size increases
-    r = int(255 * min(math.ceil(size / (2 * 1024 * 1024)), 1))
-    g = 0
-    b = 255
-    
-    bar_color.append((r, g, b))
-
-    return bar_color
-
 # Function to convert mempool data to LED pixels
 def convert_mempool_to_led_pixels(mempool):
     led_pixels = []
@@ -169,11 +157,10 @@ def convert_mempool_to_led_pixels(mempool):
 
 def convert_block_data_to_led_pixels(blocks):
     led_pixels = []
-    size = block['size']
 
     for i, block in enumerate(blocks):
         bar_length = calculate_bar_length(block['size'])
-        led_color = block_color(size)
+        led_color = fee_colors(block['extras']['medianFee'])
 
         # Create a column of LED pixels with the same color       
         led_bar = [led_color] * bar_length
