@@ -162,7 +162,18 @@ def form_fit_fees(fee_range, bar_length):
     x_new = np.linspace(0, len(fee_range) - 1, bar_length)
 
     # Use linear interpolation to estimate new values based on the old fee range
-    fee_range = np.interp(x_new, x_old, fee_range).tolist()
+    x_fee_range = np.interp(x_new, x_old, fee_range).tolist()
+
+    old_length = len(fee_range)
+    new_length = bar_length
+
+    # Calculate the scaling factor for linear interpolation
+    scaling_factor = (old_length - 1) / (new_length - 1)
+
+    # Calculate the new fee range using linear interpolation
+    fee_range = [fee_range[math.floor(i * scaling_factor)] for i in range(new_length)]
+
+    
 
     return fee_range
 
@@ -225,8 +236,9 @@ def convert_mempool_to_led_pixels(mempool):
             led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
             
         # Add Empty pixels to fill column to display edge
-        while len(led_bar) < display_height:
-            led_bar.append((0, 0, 0))
+        led_bar.extend([(0, 0, 0)] * (display_height - len(led_bar)))
+        # while len(led_bar) < display_height:
+        #     led_bar.append((0, 0, 0))
 
         # Append the bar to LED Pixel Matrix
         led_pixels.append(led_bar)
