@@ -168,15 +168,19 @@ def convert_mempool_to_led_pixels(mempool):
             rgb_fee = rgb_fees(fee, "mempool")
             segment_colors.append(rgb_fee)
         
-        led_bar = []
-        segment_lengths = [bar_length // display_height] * display_height
-        remainder = bar_length % display_height
+        while len(segment_colors) < display_height:
+            segment_colors.append((0, 0, 0))
 
-        for i in range(remainder):
-            segment_lengths[i] += 1
+        led_bar = []
+        # segment_lengths = [bar_length // display_height] * display_height
+        # remainder = bar_length % display_height
+
+        # for i in range(remainder):
+        #     segment_lengths[i] += 1
 
         for i in range(display_height):
-            led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
+            # led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
+            led_bar.extend([segment_colors[i % len(segment_colors)]] * display_height)
             
         led_pixels.append(led_bar)
 
@@ -240,48 +244,10 @@ while True:
         # Track the most recent block mined
         latest_block = blocks[0]['height']
         logging.debug(f"Block Found! {blocks[0]['height']}")
+    
     else:
         # Refresh mempool pixels to 0, 0, 0 (off)
-        logging.debug(f"Wipe Mempool")
         mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(255, 255, 255)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(255, 255, 255)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(255, 255, 255)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(255, 255, 255)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(255, 255, 255)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(255, 255, 255)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
-        mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(8)]
-        unicornhatmini.show()
-        time.sleep(0.5)
         
             
     # Pull mempool data and change to LED values
