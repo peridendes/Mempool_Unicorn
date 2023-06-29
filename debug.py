@@ -227,7 +227,7 @@ while True:
         block_pixels = convert_block_data_to_led_pixels(blocks)
 
         # Refresh the entire screen to 0, 0, 0 (off)
-        mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(17)]
+        unicornhatmini.clear()
 
         # Set the LED pixels for the blocks
         for y, led_row in enumerate(block_pixels):
