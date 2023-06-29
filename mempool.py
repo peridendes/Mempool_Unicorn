@@ -61,7 +61,7 @@ def calculate_bar_length(block_size):
 
 # Function to adjust fee range to match bar length
 def form_fit_fees(fee_range, bar_length):
-    logging.debug(f"{fee_range}")
+
     # Create an array of indices evenly spaced within the range of the fee segments
     x_old = np.linspace(0, len(fee_range) - 1, len(fee_range))
 
@@ -74,40 +74,6 @@ def form_fit_fees(fee_range, bar_length):
     logging.debug(f"{fee_range}")
 
     return fee_range
-    # logging.debug(f"Bar Length: {bar_length}, Fee Segments: {len(fee_range)}\n{fee_range}")
-    # while len(fee_range) != bar_length:
-    #     # Calculate the indices of the values closest to the middle position
-    #     middle_index = len(fee_range) // 2
-
-    #     # Check if the range is odd
-    #     if len(fee_range) % 2 != 0:
-    #         middle_index += 1
-
-    #     a_index = middle_index
-    #     b_index = middle_index - 1
-
-    #     # Find the values closest to the middle position
-    #     a = fee_range[a_index]
-    #     b = fee_range[b_index]
-
-    #     # Calculate the average
-    #     C = (a + b) / 2
-
-    #     if len(fee_range) > bar_length:
-    #         # Remove a and b from fee_range
-    #         fee_range.pop(b_index)
-    #         fee_range.pop(a_index)
-
-    #         # Insert C at the middle position
-    #         fee_range.insert(middle_index, C)
-
-    #     if len(fee_range) < bar_length:
-    #         # Insert C between a and b in the fee_range
-    #         fee_range.insert(a_index, C)
-
-    #     logging.debug(f"{fee_range}")
-
-    # return fee_range
 
 # Function to calculate the segment colors based on fee range
 def calculate_segment_colors(fee_range):
@@ -145,7 +111,7 @@ def convert_data_to_led_pixels(blocks):
 
     for i, block in enumerate(blocks):
         bar_length = calculate_bar_length(block['blockSize'])
-        logging.debug(f"Block: {i}")
+        logging.debug(f"Block: {i}, Bar Length: {bar_length}\n{fee_range}")
         fee_range = form_fit_fees(block['feeRange'], bar_length)
 
         segment_colors = calculate_segment_colors(fee_range)
