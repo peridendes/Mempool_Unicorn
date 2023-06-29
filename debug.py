@@ -240,9 +240,9 @@ while True:
         # Track the most recent block mined
         latest_block = blocks[0]['height']
         logging.debug(f"Block Found! {blocks[0]['height']}")
-
     else:
         # Refresh mempool pixels to 0, 0, 0 (off)
+        logging.debug(f"Wipe Mempool")
         mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(8)]
         unicornhatmini.show()
         time.sleep(0.5)
