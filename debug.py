@@ -70,7 +70,7 @@ def get_block_data():
                 data = response.json()
                 blocks = data[:8]  # Retrieve 8 blocks
                 return blocks
-            except requests.exceptions.RequestException as e:
+            except (requests.exceptions.RequestException, ValueError) as e:
                 print(f"Error occurred: {e}")
                 print("Retrying after 15 seconds...")
                 time.sleep(retry_interval)
@@ -198,6 +198,7 @@ while True:
     #         unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
 
     blocks = get_block_data()
+    print("{blocks}")
     block_pixels = convert_block_data_to_led_pixels(blocks)
 
     # Set the LED pixels for the blocks
