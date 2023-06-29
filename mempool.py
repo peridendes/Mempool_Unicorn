@@ -1,7 +1,6 @@
 import math
 import os
 import requests
-import signal
 import sys
 import time
 from PIL import Image, ImageDraw, ImageFont
