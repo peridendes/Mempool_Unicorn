@@ -18,7 +18,8 @@ def signal_handler(sig, frame):
     running = False
 
 # Set the signal handler for the keyboard interrupt signal
-signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGINT, signal_handler) # Ctrl+C
+signal.signal(signal.SIGTSTP, signal_handler) # Ctrl+Z
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
@@ -323,3 +324,9 @@ while running:
 
         unicornhatmini.show()
         time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
+
+unicornhatmini.clear()
+unicornhatmini.show()
+
+# Exit the program
+sys.exit(0)
