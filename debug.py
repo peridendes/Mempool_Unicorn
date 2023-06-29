@@ -109,24 +109,24 @@ def form_fit_fees(fee_range, bar_length):
 def rgb_fees(fee, data_type):
     if data_type == "mempool":
         if fee <= 10:
-            # Blue to Cyan
+            # Blue to Green
             r = 0
             g = int(255 * fee / 10)
             b = int(255 * (10 - fee) / 10)
         elif fee <= 20:
-            # Cyan to Purple
+            # Green to Yellow
             r = int(255 * (fee - 10) / 10)
             g = 255
-            b = int(255 * (20 - fee) / 10)
+            b = 0
         elif fee <= 60:
-            # Purple to Red
-            r = int(255 * (60 - fee) / 40)
-            g = int(255 * (60 - fee) / 40)
+            # Yellow to Red
+            r = 255
+            g = int(255 * (60 - fee) / 50)
             b = 0
         else:
-            # Red to White
+            # Red to Fuschia
             r = 255
-            g = int(255 * max(((fee - 500) / 500), 1))
+            g = 0
             b = int(255 * max(((fee - 500) / 500), 1))
     else:
         # Blue to Red 
