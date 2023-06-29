@@ -102,7 +102,7 @@ def form_fit_fees(fee_range, bar_length):
     # Use linear interpolation to estimate new values based on the old fee range
     fee_range = np.interp(x_new, x_old, fee_range).tolist()
 
-    logging.debug(f"{fee_range}")
+    # logging.debug(f"{fee_range}")
     return fee_range
 
 # Function to calculate the colors based on fee range
@@ -170,6 +170,7 @@ def convert_block_data_to_led_pixels(blocks):
         bar_length = calculate_bar_length(block['size'])
         medianFee = block['extras']['medianFee']
         led_color = rgb_fees(medianFee, "block")
+        logging.debug(f"Bar Length: {bar_length}, Color: {led_color}")
 
         # Create a column of LED pixels with the same color       
         led_bar = [led_color] * bar_length
@@ -207,7 +208,8 @@ while True:
     #         unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
 
     blocks = get_block_data()
-    logging.debug(f"{blocks}")
+    for block in blocks:
+        logging.debug(f"Height: {block['height']}, Size: {block['size']}, Median Fee: {block['extras']['medianFee']}")
     block_pixels = convert_block_data_to_led_pixels(blocks)
 
     # Set the LED pixels for the blocks
