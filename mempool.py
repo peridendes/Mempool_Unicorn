@@ -104,10 +104,14 @@ def get_block_data():
 
 # Function for new block alert
 def new_block_alert(block):
-    # Load a 5x7 pixel font
-    font = ImageFont.truetype("5x7.ttf", 8)
+    height = block['height']
+    reward = block['extras']['reward']
+    reward = reward / 100000000  # Convert fee to whole bitcoin
+    reward = round(reward, 3)  # Round fee to 3 decimal places
+    tx_count = block['tx_count']
+    median_fee = block['extras']['medianFee']
 
-    text = f"New Block {block['height']}"
+    text = f"    New Block {height}    Reward: {reward} BTC    Tx Count: {tx_count}    Median Fee: ~{median_fee} sat/vB    "
 
     # Measure the width of text
     text_width = font.getsize(text)
@@ -116,6 +120,9 @@ def new_block_alert(block):
     image = Image.new('P', (text_width[0] + display_width + display_width, display_height), 0)
     draw = ImageDraw.Draw(image)
 
+    # Load a 5x7 pixel font
+    font = ImageFont.truetype("5x7.ttf", 8)
+    
     # Draw the text into the image
     draw.text((display_width, -1), text, font=font, fill=255)
 
@@ -125,14 +132,14 @@ def new_block_alert(block):
         for y in range(display_height):
             for x in range(display_width):
                 if image.getpixel((x + offset_x, y)) == 255:
-                    unicornhatmini.set_pixel(x, y, 255, 255, 255)
+                    unicornhatmini.set_pixel(x, y, 242, 169, 0) # Bitcoin Orange 
                 else:
-                    unicornhatmini.set_pixel(x, y, 0, 0, 0)
+                    unicornhatmini.set_pixel(x, y, 77, 77, 78) # Bitcoin Grey
 
         offset_x += 1
 
         unicornhatmini.show()
-        time.sleep(0.1)
+        time.sleep(0.05)
 
     return 0
 
