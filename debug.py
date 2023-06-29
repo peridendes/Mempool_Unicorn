@@ -197,6 +197,9 @@ display_width, display_height = unicornhatmini.get_shape()
 # Too bright for the eye
 unicornhatmini.set_brightness(0.05)
 
+# Track the most recent block mined
+latest_block = 0
+
 while True:
     mempool = get_mempool_data()
     mempool_pixels = convert_mempool_to_led_pixels(mempool)
@@ -208,14 +211,19 @@ while True:
             unicornhatmini.set_pixel(7 - y, 6 - x, r, g, b)
 
     blocks = get_block_data()
-    block_pixels = convert_block_data_to_led_pixels(blocks)
+    if blocks[0]['height'] > latest_block:
+        block_pixels = convert_block_data_to_led_pixels(blocks)
 
-    # Set the LED pixels for the blocks
-    for y, led_row in enumerate(block_pixels):
-        for x, pixel_color in enumerate(led_row):
-            r, g, b = pixel_color
-            # Set the pixel for the right 8 columns at the corresponding position
-            unicornhatmini.set_pixel(9 + y, 6 - x, r, g, b)
+        # Set the LED pixels for the blocks
+        for y, led_row in enumerate(block_pixels):
+            for x, pixel_color in enumerate(led_row):
+                r, g, b = pixel_color
+                # Set the pixel for the right 8 columns at the corresponding position
+                unicornhatmini.set_pixel(9 + y, 6 - x, r, g, b)
+        
+        # Track the most recent block mined
+        latest_block = blocks[0]['height']
+        logging.debug(f"Block Found! {blocks[0]['height']}")
 
     unicornhatmini.show()
     time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
