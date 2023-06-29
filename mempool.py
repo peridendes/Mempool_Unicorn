@@ -111,7 +111,7 @@ def convert_data_to_led_pixels(blocks):
 
     for i, block in enumerate(blocks):
         bar_length = calculate_bar_length(block['blockSize'])
-        logging.debug(f"Block: {i}, Bar Length: {bar_length}\n{fee_range}")
+        logging.debug(f"Block: {i}, Bar Length: {bar_length}\n{block['feeRange']}")
         fee_range = form_fit_fees(block['feeRange'], bar_length)
 
         segment_colors = calculate_segment_colors(fee_range)
