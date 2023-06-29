@@ -276,8 +276,6 @@ while True:
 
     # First run and whenever a new block is found
     if blocks[0]['height'] > latest_block:
-        latest_block = blocks[0]['height']
-
         block_pixels = convert_block_data_to_led_pixels(blocks)
         
         # New block found
@@ -292,7 +290,10 @@ while True:
             for x, pixel_color in enumerate(led_row):
                 r, g, b = pixel_color
                 # Set the pixel for the right 8 columns at the corresponding position
-                unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)   
+                unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
+        
+        # Update tracking of most recent block mined
+        latest_block = blocks[0]['height']
             
     # Pull mempool data and change to LED values
     mempool = get_mempool_data()
