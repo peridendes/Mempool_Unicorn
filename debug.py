@@ -108,6 +108,9 @@ def form_fit_fees(fee_range, bar_length):
 def fee_colors(fee_range):
     segment_colors = []
 
+    if isinstance(fee_range, int):
+        fee_range = [fee_range] # Convert integer to a single-element list
+
     for fee in fee_range:
         if fee <= 10:
             # Blue to Green
@@ -163,10 +166,7 @@ def convert_block_data_to_led_pixels(blocks):
 
     for block in blocks:
         bar_length = calculate_bar_length(block['size'])
-        medianFee = []
-        medianFee.append(block['extras']['medianFee'])
-
-        led_color = fee_colors(medianFee)
+        led_color = fee_colors(block['extras']['medianFee'])
 
         # Create a column of LED pixels with the same color       
         led_bar = [led_color] * bar_length
