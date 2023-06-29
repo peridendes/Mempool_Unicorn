@@ -199,17 +199,15 @@ unicornhatmini.set_brightness(0.05)
 
 while True:
     mempool = get_mempool_data()
-    # mempool_pixels = convert_mempool_to_led_pixels(mempool)
+    mempool_pixels = convert_mempool_to_led_pixels(mempool)
 
-    # # Set the LED pixels for the mempool
-    # for y, led_row in enumerate(mempool_pixels):
-    #     for x, pixel_color in enumerate(led_row):
-    #         r, g, b = pixel_color
-    #         unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
+    # Set the LED pixels for the mempool
+    for y, led_row in enumerate(mempool_pixels):
+        for x, pixel_color in enumerate(led_row):
+            r, g, b = pixel_color
+            unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
 
     blocks = get_block_data()
-    for block in blocks:
-        logging.debug(f"Height: {block['height']}, Size: {block['size']}, Median Fee: {block['extras']['medianFee']}")
     block_pixels = convert_block_data_to_led_pixels(blocks)
 
     # Set the LED pixels for the blocks
@@ -217,7 +215,7 @@ while True:
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
             # Set the pixel for the right 8 columns at the corresponding position
-            unicornhatmini.set_pixel(8 + y, 6 - x, r, g, b)
+            unicornhatmini.set_pixel(9 + y, 6 - x, r, g, b)
 
     unicornhatmini.show()
     time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
