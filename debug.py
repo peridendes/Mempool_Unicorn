@@ -327,8 +327,7 @@ while running:
             time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
 
     except Exception as e:
-        # Handle any other exceptions here
-        # ...ß
+        print(f"Error occurred: {e}")
     
 unicornhatmini.clear()
 unicornhatmini.show()
