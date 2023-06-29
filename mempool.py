@@ -159,11 +159,13 @@ def convert_mempool_to_led_pixels(mempool):
         bar_length = calculate_bar_length(block['blockSize'])
         fee_range = form_fit_fees(block['feeRange'], bar_length)
 
+        # Create an array of colors representing the fee range of the block
         segment_colors = []
         for fee in fee_range:
             rgb_fee = rgb_fees(fee, "mempool")
             segment_colors.append(rgb_fee)
-        
+
+        # 
         led_bar = []
         segment_lengths = [bar_length // display_height] * display_height
         remainder = bar_length % display_height
@@ -174,6 +176,10 @@ def convert_mempool_to_led_pixels(mempool):
         for i in range(display_height):
             led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
             
+        # Add Empty pixels to the end of each column
+        while len(led_bar) < display_height:
+            led_bar.append((0, 0, 0))
+
         led_pixels.append(led_bar)
 
     return led_pixels
@@ -219,11 +225,12 @@ while True:
 
     # First run and whenever a new block is found
     if blocks[0]['height'] > latest_block:
-        # Refresh the entire screen
+        block_pixels = convert_block_data_to_led_pixels(blocks)
+
+        # Refresh the entire screen to 0, 0, 0 (off)
         unicornhatmini.clear()
 
-        # Update Block Pixels
-        block_pixels = convert_block_data_to_led_pixels(blocks)
+        # Set the LED pixels for the blocks
         for y, led_row in enumerate(block_pixels):
             for x, pixel_color in enumerate(led_row):
                 r, g, b = pixel_color
@@ -231,19 +238,17 @@ while True:
                 unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
         
         # Track the most recent block mined
-        latest_block = blocks[0]['height']
-
-    else:
-        # Every run refresh mempool pixels
-        mempool_pixels = [[(0, 0, 0)] * 7 for _ in range(8)]
+        latest_block = blocks[0]['height']   
             
-    # Update Mempool Pixels
+    # Pull mempool data and change to LED values
     mempool = get_mempool_data()
     mempool_pixels = convert_mempool_to_led_pixels(mempool)
+
+    # Set the LED pixels for the mempool
     for y, led_row in enumerate(mempool_pixels):
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
             unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
 
     unicornhatmini.show()
-    time.sleep(15)  # Wait for 15 seconds before refreshing the data and screen
+    time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen

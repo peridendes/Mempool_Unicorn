@@ -169,14 +169,9 @@ def convert_mempool_to_led_pixels(mempool):
             segment_colors.append(rgb_fee)
 
         led_bar = []
-        segment_lengths = [bar_length // display_height] * display_height
-        remainder = bar_length % display_height
-
-        for i in range(remainder):
-            segment_lengths[i] += 1
 
         for i in range(display_height):
-            led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
+            led_bar.extend([segment_colors[i % len(segment_colors)]])
             
         # Add Empty pixels to the end of each column
         while len(led_bar) < display_height:
