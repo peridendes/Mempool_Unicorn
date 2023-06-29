@@ -181,7 +181,7 @@ def convert_mempool_to_led_pixels(mempool):
         # Add Empty pixels to the end of each column
         while len(led_bar) < display_height:
             logging.debug(f"Segment Length: {len(led_bar)}")
-            segment_colors.append((0, 0, 0))
+            led_bar.append((0, 0, 0))
             logging.debug(f"{led_bar}")
 
         led_pixels.append(led_bar)
