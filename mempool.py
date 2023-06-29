@@ -137,7 +137,7 @@ def new_block_alert(block):
                 if image.getpixel((x + offset_x, y)) == 255:
                     unicornhatmini.set_pixel(x, y, 242, 169, 0) # Bitcoin Orange 
                 else:
-                    unicornhatmini.set_pixel(x, y, 77, 77, 78) # Bitcoin Grey
+                    unicornhatmini.set_pixel(x, y, 0, 0, 0)
 
         # Scroll
         offset_x += 1
