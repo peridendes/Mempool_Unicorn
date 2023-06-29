@@ -1,3 +1,4 @@
+import logging
 import math
 import numpy as np
 import os
@@ -5,6 +6,8 @@ import requests
 import sys
 import time
 from unicornhatmini import UnicornHATMini
+
+logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
@@ -198,7 +201,7 @@ while True:
     #         unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
 
     blocks = get_block_data()
-    print("{blocks}")
+    logging.debug(f"{blocks}")
     block_pixels = convert_block_data_to_led_pixels(blocks)
 
     # Set the LED pixels for the blocks
