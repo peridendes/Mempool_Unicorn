@@ -132,7 +132,7 @@ def rgb_fees(fee, data_type):
         # Blue to Red 
         r = int(255 * min((fee / 60), 1))
         g = 0
-        b = int(255 * min ((60 - fee)/60), 0)
+        b = int(255 * min((60 - fee)/60), 0)
 
     return r, g, b
 
