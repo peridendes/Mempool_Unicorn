@@ -107,7 +107,7 @@ def form_fit_fees(fee_range, bar_length):
 
 # Function to calculate the colors based on fee range
 def rgb_fees(fee, data_type):
-    if data_type == "block":
+    if data_type == "mempool":
         if fee <= 10:
             # Blue to Cyan
             r = 0
