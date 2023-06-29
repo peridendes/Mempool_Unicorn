@@ -158,7 +158,7 @@ def convert_mempool_to_led_pixels(mempool):
 def convert_block_data_to_led_pixels(blocks):
     led_pixels = []
 
-    for i, block in enumerate(blocks):
+    for block in blocks:
         bar_length = calculate_bar_length(block['size'])
         led_color = fee_colors(block['extras']['medianFee'])
 
