@@ -106,37 +106,35 @@ def form_fit_fees(fee_range, bar_length):
     return fee_range
 
 # Function to calculate the colors based on fee range
-def fee_colors(fee_range):
-    segment_colors = []
-
-    if isinstance(fee_range, int):
-        fee_range = [fee_range] # Convert integer to a single-element list
-
-    for fee in fee_range:
+def rgb_fees(fee, data_type):
+    if data_type == "block":
         if fee <= 10:
-            # Blue to Green
+            # Blue to Cyan
             r = 0
             g = int(255 * fee / 10)
             b = int(255 * (10 - fee) / 10)
         elif fee <= 20:
-            # Green to Yellow
+            # Cyan to Purple
             r = int(255 * (fee - 10) / 10)
             g = 255
-            b = 0
+            b = int(255 * (20 - fee) / 10)
         elif fee <= 60:
-            # Yellow to Red
-            r = 255
-            g = int(255 * (60 - fee) / 50)
+            # Purple to Red
+            r = int(255 * (60 - fee) / 40)
+            g = int(255 * (60 - fee) / 40)
             b = 0
         else:
-            # Gradient from red to fuchsia
+            # Red to White
             r = 255
-            g = 0
-            b = int(255 * (max(fee_range) - fee) / (max(fee_range) - 60))
+            g = int(255 * (max(fee) - fee) / (max(fee) - 60))
+            b = int(255 * (max(fee) - fee) / (max(fee) - 60))
+    else:
+        # Blue to Purple 
+        r = int(255 * min((fee / 60), 1))
+        g = 0
+        b = 255
 
-        segment_colors.append((r, g, b))
-
-    return segment_colors
+    return r, g, b
 
 # Function to convert mempool data to LED pixels
 def convert_mempool_to_led_pixels(mempool):
@@ -146,8 +144,11 @@ def convert_mempool_to_led_pixels(mempool):
         bar_length = calculate_bar_length(block['blockSize'])
         fee_range = form_fit_fees(block['feeRange'], bar_length)
 
-        segment_colors = fee_colors(fee_range)
-
+        segment_colors = []
+        for fee in fee_range:
+            rgb_fee = rgb_fees(fee, "mempool")
+            segment_colors.append(rgb_fee)
+        
         led_bar = []
         segment_lengths = [bar_length // display_height] * display_height
         remainder = bar_length % display_height
@@ -167,7 +168,8 @@ def convert_block_data_to_led_pixels(blocks):
 
     for block in blocks:
         bar_length = calculate_bar_length(block['size'])
-        led_color = fee_colors(block['extras']['medianFee'])
+        medianFee = block['extras']['medianFee']
+        led_color = rgb_fees(medianFee, "block")
 
         # Create a column of LED pixels with the same color       
         led_bar = [led_color] * bar_length
