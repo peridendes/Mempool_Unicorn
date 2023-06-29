@@ -182,7 +182,6 @@ def convert_block_data_to_led_pixels(blocks):
 
 # Main program
 unicornhatmini = UnicornHATMini()
-
 rotation = 180
 if len(sys.argv) > 1:
     try:
@@ -192,7 +191,7 @@ if len(sys.argv) > 1:
         sys.exit(1)
 
 unicornhatmini.set_rotation(rotation)
-display_width, display_height = unicornhatmini.get_shape()
+display_height = 7
 
 # Too bright for the eye
 unicornhatmini.set_brightness(0.1)
@@ -204,25 +203,29 @@ while True:
     mempool = get_mempool_data()
     mempool_pixels = convert_mempool_to_led_pixels(mempool)
 
+    # Refresh mempool side
+    
     # Set the LED pixels for the mempool
     for y, led_row in enumerate(mempool_pixels):
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
-            unicornhatmini.clear(7 - y, 6 - x)
-            unicornhatmini.set_pixel(7 - y, 6 - x, r, g, b)
+            unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
             logging.debug(f"Mempool\nY:{y}, X:{x}, R:{r}, G:{g}, B:{b}")
 
     blocks = get_block_data()
+
+    # First run and whenever a new block is found
     if blocks[0]['height'] > latest_block:
         block_pixels = convert_block_data_to_led_pixels(blocks)
 
+        # Refresh the block side
+        
         # Set the LED pixels for the blocks
         for y, led_row in enumerate(block_pixels):
             for x, pixel_color in enumerate(led_row):
                 r, g, b = pixel_color
-                unicornhatmini.clear(9 + y, 6 - x)
                 # Set the pixel for the right 8 columns at the corresponding position
-                unicornhatmini.set_pixel(9 + y, 6 - x, r, g, b)
+                unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
                 logging.debug(f"Blocks\nY:{y}, X:{x}, R:{r}, G:{g}, B:{b}")
         
         # Track the most recent block mined
