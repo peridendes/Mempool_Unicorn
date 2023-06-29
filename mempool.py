@@ -70,7 +70,7 @@ def get_block_data():
                 data = response.json()
                 blocks = data[:8]  # Retrieve 8 blocks
                 return blocks
-            except requests.exceptions.RequestException as e:
+            except (requests.exceptions.RequestException, ValueError) as e:
                 print(f"Error occurred: {e}")
                 print("Retrying after 15 seconds...")
                 time.sleep(retry_interval)
@@ -102,10 +102,8 @@ def form_fit_fees(fee_range, bar_length):
     return fee_range
 
 # Function to calculate the colors based on fee range
-def fee_colors(fee_range):
-    segment_colors = []
-
-    for fee in fee_range:
+def rgb_fees(fee, data_type):
+    if data_type == "mempool":
         if fee <= 10:
             # Blue to Green
             r = 0
@@ -122,26 +120,17 @@ def fee_colors(fee_range):
             g = int(255 * (60 - fee) / 50)
             b = 0
         else:
-            # Gradient from red to fuchsia
+            # Red to Fuschia
             r = 255
             g = 0
-            b = int(255 * (max(fee_range) - fee) / (max(fee_range) - 60))
+            b = int(255 * max(((fee - 500) / 500), 1))
+    else:
+        # Blue to Red 
+        r = int(255 * min(math.pow((fee / 60), 2), 1)) # exponential growth
+        g = 0
+        b = int(255 * max(math.pow(((60 - fee) / 60), 0.5), 0)) # exponential shrink
 
-        segment_colors.append((r, g, b))
-
-    return segment_colors
-
-# Function to calculate the colors based on block size
-def block_color(size):
-    bar_color = []
-    # Blue to Purple as block size increases
-    r = int(255 * min(math.ceil(size / (2 * 1024 * 1024)), 1))
-    g = 0
-    b = 255
-    
-    bar_color.append((r, g, b))
-
-    return bar_color
+    return r, g, b
 
 # Function to convert mempool data to LED pixels
 def convert_mempool_to_led_pixels(mempool):
@@ -151,8 +140,11 @@ def convert_mempool_to_led_pixels(mempool):
         bar_length = calculate_bar_length(block['blockSize'])
         fee_range = form_fit_fees(block['feeRange'], bar_length)
 
-        segment_colors = fee_colors(fee_range)
-
+        segment_colors = []
+        for fee in fee_range:
+            rgb_fee = rgb_fees(fee, "mempool")
+            segment_colors.append(rgb_fee)
+        
         led_bar = []
         segment_lengths = [bar_length // display_height] * display_height
         remainder = bar_length % display_height
@@ -169,11 +161,11 @@ def convert_mempool_to_led_pixels(mempool):
 
 def convert_block_data_to_led_pixels(blocks):
     led_pixels = []
-    size = block['size']
 
-    for i, block in enumerate(blocks):
+    for block in blocks:
         bar_length = calculate_bar_length(block['size'])
-        led_color = block_color(size)
+        medianFee = block['extras']['medianFee']
+        led_color = rgb_fees(medianFee, "block")
 
         # Create a column of LED pixels with the same color       
         led_bar = [led_color] * bar_length
@@ -200,6 +192,9 @@ display_width, display_height = unicornhatmini.get_shape()
 # Too bright for the eye
 unicornhatmini.set_brightness(0.05)
 
+# Track the most recent block mined
+latest_block = 0
+
 while True:
     mempool = get_mempool_data()
     mempool_pixels = convert_mempool_to_led_pixels(mempool)
@@ -208,17 +203,21 @@ while True:
     for y, led_row in enumerate(mempool_pixels):
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
-            unicornhatmini.set_pixel(8 - y, 6 - x, r, g, b)
+            unicornhatmini.set_pixel(7 - y, 6 - x, r, g, b)
 
     blocks = get_block_data()
-    block_pixels = convert_block_data_to_led_pixels(blocks)
+    if blocks[0]['height'] > latest_block:
+        block_pixels = convert_block_data_to_led_pixels(blocks)
 
-    # Set the LED pixels for the blocks
-    for y, led_row in enumerate(block_pixels):
-        for x, pixel_color in enumerate(led_row):
-            r, g, b = pixel_color
-            # Set the pixel for the right 8 columns at the corresponding position
-            unicornhatmini.set_pixel(8 + y, 6 - x, r, g, b)
+        # Set the LED pixels for the blocks
+        for y, led_row in enumerate(block_pixels):
+            for x, pixel_color in enumerate(led_row):
+                r, g, b = pixel_color
+                # Set the pixel for the right 8 columns at the corresponding position
+                unicornhatmini.set_pixel(9 + y, 6 - x, r, g, b)
+        
+        # Track the most recent block mined
+        latest_block = blocks[0]['height']
 
     unicornhatmini.show()
     time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
