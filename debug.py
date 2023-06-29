@@ -163,24 +163,33 @@ def convert_mempool_to_led_pixels(mempool):
         bar_length = calculate_bar_length(block['blockSize'])
         fee_range = form_fit_fees(block['feeRange'], bar_length)
 
+        # Create an array of colors representing the fee range of the block
         segment_colors = []
         for fee in fee_range:
             rgb_fee = rgb_fees(fee, "mempool")
             segment_colors.append(rgb_fee)
 
+        # Create an array to be colored
+        segment_lengths = [bar_length // display_height] * display_height
+        remainder = bar_length % display_height
+
+        # Picking the segments of the array to color
+        for i in range(remainder):
+            segment_lengths[i] += 1
+
+        # Color segments using array of colors
         led_bar = []
-
         for i in range(display_height):
-            led_bar.extend([segment_colors[i % len(segment_colors)] for i in range(bar_length)])
+            led_bar.extend([segment_colors[i % len(segment_colors)]] * segment_lengths[i])
             
-        # Add Empty pixels to the end of each column
+        # Add Empty pixels to fill column to display edge
         while len(led_bar) < display_height:
-            logging.debug(f"Segment Length: {len(led_bar)}")
             led_bar.append((0, 0, 0))
-            logging.debug(f"{led_bar}")
 
+        # Append the bar to LED Pixel Matrix
         led_pixels.append(led_bar)
 
+    # LED Pixel Matrix
     return led_pixels
 
 def convert_block_data_to_led_pixels(blocks):
