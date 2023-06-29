@@ -111,23 +111,26 @@ def new_block_alert(block):
     tx_count = block['tx_count']
     median_fee = block['extras']['medianFee']
 
+    # Text to scroll when new block is mined
     text = f"    New Block {height}    Reward: {reward} BTC    Tx Count: {tx_count}    Median Fee: ~{median_fee} sat/vB    "
 
+    # Load a 5x7 pixel font
+    font = ImageFont.truetype("5x7.ttf", 8)
+    
     # Measure the width of text
     text_width = font.getsize(text)
 
     # Create a new PIL image big enough to fit the text
     image = Image.new('P', (text_width[0] + display_width + display_width, display_height), 0)
     draw = ImageDraw.Draw(image)
-
-    # Load a 5x7 pixel font
-    font = ImageFont.truetype("5x7.ttf", 8)
     
     # Draw the text into the image
     draw.text((display_width, -1), text, font=font, fill=255)
 
+    # Align off right edge on display
     offset_x = 0
 
+    # Draw text from image based
     while (offset_x + display_width <= image.size[0]):
         for y in range(display_height):
             for x in range(display_width):
@@ -136,13 +139,14 @@ def new_block_alert(block):
                 else:
                     unicornhatmini.set_pixel(x, y, 77, 77, 78) # Bitcoin Grey
 
+        # Scroll
         offset_x += 1
 
         unicornhatmini.show()
         time.sleep(0.05)
 
     return 0
-
+ß
 # Function to calculate the length of the column by the block size
 def calculate_bar_length(block_size):
     bar_length = min(math.ceil(block_size / (2 * 1024 * 1024) * display_height), display_height)
