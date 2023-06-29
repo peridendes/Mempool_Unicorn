@@ -1,10 +1,19 @@
 import math
 import os
 import requests
+import signal
 import sys
 import time
 from PIL import Image, ImageDraw, ImageFont
 from unicornhatmini import UnicornHATMini
+
+# Flag variable to indicate if the loop should continue running
+running = True
+
+# Handler for the keyboard interrupt signal (Ctrl+C)
+def signal_handler(sig, frame):
+    global running
+    running = False
 
 # Function to retrieve mempool data from the API
 def get_mempool_data():
