@@ -7,13 +7,19 @@ import sys
 import time
 from PIL import Image, ImageDraw, ImageFont
 from unicornhatmini import UnicornHATMini
-from tenacity import retry, stop_after_attempt, wait_exponential
 
-# Retry decorator for API requests with exponential backoff
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=15, max=60))
 def api_request(url):
-    response = requests.get(url)
-    response.raise_for_status()
+    response = None
+    for _ in range(3):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            break
+        except requests.exceptions.RequestException:
+            print("Error occurred. Retrying after 60 seconds...")
+            time.sleep(60)  # Wait for 60 seconds before retrying
+    if response is None:
+        raise Exception("Failed to make API request after 3 attempts")
     return response.json()
 
 # Function to retrieve mempool data from the API
