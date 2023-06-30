@@ -65,16 +65,14 @@ def get_data(api_endpoint):
 
 # New Block Found
 def new_block(block):
-    height = block['height']
-    reward = round((block['extras']['reward'] / 100000000), 3)
-    tx_count = block['tx_count']
-    median_fee = block['extras']['medianFee']
-
-    # Text to scroll when new block is mined
-    text = "New Block {}    Reward: {} BTC    Tx Count: {}    Median Fee: ~{} sat/vB"
-    text.format(height, reward, tx_count, median_fee)
-
-    scroll_text(text)
+    text = [
+        f"New Block {block['height']}",
+        f"Reward: {round((block['extras']['reward'] / 100000000), 3)} BTC",
+        f"Tx Count: {block['tx_count']}",
+        f"Median Fee: ~{block['extras']['medianFee']} sat/vB"
+    ]
+    sentence = "    ".join(text[1:])
+    scroll_text(sentence)
 
 # Function for scrolling text
 def scroll_text(text):
@@ -216,7 +214,7 @@ def convert_block_data_to_led_pixels(blocks):
 def pressed(button):
     button_name = button_map[button.pin.number]
     
-    print(f"Button {button_name} pressed!")
+    scroll_text(f"Button {button_name} pressed!")
 
 button_map = {5: "A",
               6: "B",
