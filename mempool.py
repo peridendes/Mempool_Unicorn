@@ -226,8 +226,6 @@ def convert_mempool_to_led_pixels(mempool):
             
         # Add Empty pixels to fill column to display edge
         led_bar.extend([(0, 0, 0)] * (display_height - len(led_bar)))
-        # while len(led_bar) < display_height:
-        #     led_bar.append((0, 0, 0))
 
         # Append the bar to LED Pixel Matrix
         led_pixels.append(led_bar)
