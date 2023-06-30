@@ -270,7 +270,7 @@ try:
         
             # New block found
             if latest_block != 0:
-                new_block(block[0])
+                new_block(blocks[0])
 
             # Refresh the entire screen to 0, 0, 0 (off)
             unicornhatmini.clear()
