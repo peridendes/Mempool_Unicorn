@@ -8,6 +8,7 @@ import sys
 import time
 from PIL import Image, ImageDraw, ImageFont
 from unicornhatmini import UnicornHATMini
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 

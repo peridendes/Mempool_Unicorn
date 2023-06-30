@@ -7,6 +7,7 @@ import sys
 import time
 from PIL import Image, ImageDraw, ImageFont
 from unicornhatmini import UnicornHATMini
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 # Retry decorator for API requests with exponential backoff
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=15, max=60))
