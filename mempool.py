@@ -194,9 +194,7 @@ def draw_mempool(mempool):
     for y, led_row in enumerate(led_pixels):
         for x, pixel_color in enumerate(led_row):
             r, g, b = pixel_color
-            unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
-
-    unicornhatmini.show()
+            unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)    
 
 # Function to convert block data to LED pixels
 def draw_blocks(blocks):
@@ -223,8 +221,6 @@ def draw_blocks(blocks):
             # Set the pixel for the right 8 columns at the corresponding position
             unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
 
-    unicornhatmini.show()
-
 def pressed(button):
     button_name = button_map[button.pin.number]
     
@@ -234,6 +230,7 @@ def pressed(button):
     draw_blocks(blocks)
     mempool = get_data("/api/v1/fees/mempool-blocks")
     draw_mempool(mempool)
+    unicornhatmini.show()
 
 button_map = {5: "A",
               6: "B",
@@ -255,11 +252,6 @@ Press Ctrl+C to exit!
 """)
 
 try:
-    button_a.when_pressed = pressed
-    button_b.when_pressed = pressed
-    button_x.when_pressed = pressed
-    button_y.when_pressed = pressed
-
     unicornhatmini = UnicornHATMini()
 
     rotation = 0
@@ -276,6 +268,11 @@ try:
     # Too bright for the eye
     unicornhatmini.set_brightness(0.1)
 
+    button_a.when_pressed = pressed
+    button_b.when_pressed = pressed
+    button_x.when_pressed = pressed
+    button_y.when_pressed = pressed
+    
     # Track the most recent block mined
     latest_block = 0
 
@@ -298,6 +295,7 @@ try:
         mempool = get_data("/api/v1/fees/mempool-blocks")
         draw_mempool(mempool)
         
+        unicornhatmini.show()
         time.sleep(15)  # Wait for 15 seconds before refreshing the data and screen
 
 except KeyboardInterrupt:
