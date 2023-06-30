@@ -1,7 +1,9 @@
+from gpiozero import Button
 import logging
 import math
 import os
 import requests
+from signal import pause
 import sys
 import time
 from PIL import Image, ImageDraw, ImageFont
@@ -9,7 +11,15 @@ from unicornhatmini import UnicornHATMini
 
 logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
+# Retry decorator for API requests with exponential backoff
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=15, max=60))
+def api_request(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.json()
+
 # Function to retrieve mempool data from the API
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=15, max=60))
 def get_mempool_data():
     # Attempt to load Environment Variable
     node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
@@ -33,23 +43,37 @@ def get_mempool_data():
                 f.write(f"MEMPOOL_NODE_ADDRESS={node_address}\n")
 
     if node_address:
-        url = f"{node_address}/api/v1/fees/mempool-blocks"
-        max_retries = 3
-        retry_interval = 15  # seconds
-        retries = 0
+    #     url = f"{node_address}/api/v1/fees/mempool-blocks"
+    #     max_retries = 3
+    #     retry_interval = 15  # seconds
+    #     retries = 0
 
-        while retries < max_retries:
-            try:
-                response = requests.get(url)
-                response.raise_for_status()
-                data = response.json()
-                blocks = data[:8]  # Retrieve 8 blocks
-                return blocks
-            except (requests.exceptions.RequestException, ValueError) as e:
-                print(f"Error occurred: {e}")
-                print("Retrying after 15 seconds...")
-                time.sleep(retry_interval)
-                retries += 1
+    #     while retries < max_retries:
+    #         try:
+    #             data = api_request(url)
+    #             blocks = data[:8]  # Retrieve 8 blocks
+    #             return blocks
+    #         except (requests.exceptions.RequestException, ValueError) as e:
+    #             print(f"Error occurred: {e}")
+    #             print("Retrying after 15 seconds...")
+    #             time.sleep(retry_interval)
+    #             retries += 1
+
+    #     print("Max retries exceeded. Exiting...")
+    # else:
+    #     print("No MEMPOOL_NODE_ADDRESS found. Exiting...")
+
+    # return None
+        try:
+            url = f"{node_address}/api/v1/fees/mempool-blocks"  
+            data = api_request(url)
+            blocks = data[:8]  # Retrieve 8 blocks
+            return blocks
+        except (requests.exceptions.RequestException, ValueError) as e:
+            print(f"Error occurred: {e}")
+            print("Retrying after 15 seconds...")
+            time.sleep(retry_interval)
+            retries += 1
 
         print("Max retries exceeded. Exiting...")
     else:
@@ -58,6 +82,7 @@ def get_mempool_data():
     return None
 
 # Function to retrieve block data from the API
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=15, max=60))
 def get_block_data():
     node_address = os.getenv("MEMPOOL_NODE_ADDRESS")
     
@@ -80,23 +105,32 @@ def get_block_data():
                 f.write(f"MEMPOOL_NODE_ADDRESS={node_address}\n")
 
     if node_address:
-        url = f"{node_address}/api/v1/blocks"
-        max_retries = 3
-        retry_interval = 15  # seconds
-        retries = 0
+        # url = f"{node_address}/api/v1/blocks"
+        # max_retries = 3
+        # retry_interval = 15  # seconds
+        # retries = 0
 
-        while retries < max_retries:
-            try:
-                response = requests.get(url)
-                response.raise_for_status()
-                data = response.json()
-                blocks = data[:8]  # Retrieve 8 blocks
-                return blocks
-            except (requests.exceptions.RequestException, ValueError) as e:
-                print(f"Error occurred: {e}")
-                print("Retrying after 15 seconds...")
-                time.sleep(retry_interval)
-                retries += 1
+        # while retries < max_retries:
+            # try:
+            #     data = api_request(url)
+            #     blocks = data[:8]  # Retrieve 8 blocks
+            #     return blocks
+            # except (requests.exceptions.RequestException, ValueError) as e:
+            #     print(f"Error occurred: {e}")
+            #     print("Retrying after 15 seconds...")
+            #     time.sleep(retry_interval)
+            #     retries += 1
+
+        try:
+            url = f"{node_address}/api/v1/blocks"   
+            data = api_request(url)
+            blocks = data[:8]  # Retrieve 8 blocks
+            return blocks
+        except (requests.exceptions.RequestException, ValueError) as e:
+            print(f"Error occurred: {e}")
+            print("Retrying after 15 seconds...")
+            time.sleep(retry_interval)
+            retries += 1
 
         print("Max retries exceeded. Exiting...")
     else:
@@ -253,60 +287,95 @@ def convert_block_data_to_led_pixels(blocks):
 
     return led_pixels
 
-# Main program
-unicornhatmini = UnicornHATMini()
-
-rotation = 180
-if len(sys.argv) > 1:
-    try:
-        rotation = int(sys.argv[1])
-    except ValueError:
-        print("Usage: {} <rotation>".format(sys.argv[0]))
-        sys.exit(1)
-
-unicornhatmini.set_rotation(rotation)
-display_width, display_height = unicornhatmini.get_shape()
-
-# Too bright for the eye
-unicornhatmini.set_brightness(0.1)
-
-# Track the most recent block mined
-latest_block = 0
-
-# Main Program Loop
-while True:
-    blocks = get_block_data()
-
-    # First run and whenever a new block is found
-    if blocks[0]['height'] > latest_block:
-        block_pixels = convert_block_data_to_led_pixels(blocks)
+def pressed(button):
+    button_name = button_map[button.pin.number]
     
-        # New block found
-        if latest_block != 0:
-            new_block_alert(blocks[0]) 
+    print(f"Button {button_name} pressed!")
 
-        # Refresh the entire screen to 0, 0, 0 (off)
-        unicornhatmini.clear()
+button_map = {5: "A",
+              6: "B",
+              16: "X",
+              24: "Y"}
 
-        # Set the LED pixels for the blocks
-        for y, led_row in enumerate(block_pixels):
+button_a = Button(5)
+button_b = Button(6)
+button_x = Button(16)
+button_y = Button(24)
+
+# Main program
+print("""Mempool Unicorn Debug: debug.py
+
+Used to debug mempool.py
+
+Press Ctrl+C to exit!
+
+""")
+
+try:
+    button_a.when_pressed = pressed
+    button_b.when_pressed = pressed
+    button_x.when_pressed = pressed
+    button_y.when_pressed = pressed
+
+    unicornhatmini = UnicornHATMini()
+
+    rotation = 180
+    if len(sys.argv) > 1:
+        try:
+            rotation = int(sys.argv[1])
+        except ValueError:
+            print("Usage: {} <rotation>".format(sys.argv[0]))
+            sys.exit(1)
+
+    unicornhatmini.set_rotation(rotation)
+    display_width, display_height = unicornhatmini.get_shape()
+
+    # Too bright for the eye
+    unicornhatmini.set_brightness(0.1)
+
+    # Track the most recent block mined
+    latest_block = 0
+
+    # Main Program Loop
+    while True:
+        blocks = get_block_data()
+
+        # First run and whenever a new block is found
+        if blocks[0]['height'] > latest_block:
+            block_pixels = convert_block_data_to_led_pixels(blocks)
+        
+            # New block found
+            if latest_block != 0:
+                new_block_alert(blocks[0]) 
+
+            # Refresh the entire screen to 0, 0, 0 (off)
+            unicornhatmini.clear()
+
+            # Set the LED pixels for the blocks
+            for y, led_row in enumerate(block_pixels):
+                for x, pixel_color in enumerate(led_row):
+                    r, g, b = pixel_color
+                    # Set the pixel for the right 8 columns at the corresponding position
+                    unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
+                    
+            # Update tracking of most recent block mined
+            latest_block = blocks[0]['height']
+                        
+        # Pull mempool data and change to LED values
+        mempool = get_mempool_data()
+        mempool_pixels = convert_mempool_to_led_pixels(mempool)
+
+        # Set the LED pixels for the mempool
+        for y, led_row in enumerate(mempool_pixels):
             for x, pixel_color in enumerate(led_row):
                 r, g, b = pixel_color
-                # Set the pixel for the right 8 columns at the corresponding position
-                unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
-                
-        # Update tracking of most recent block mined
-        latest_block = blocks[0]['height']
-                    
-    # Pull mempool data and change to LED values
-    mempool = get_mempool_data()
-    mempool_pixels = convert_mempool_to_led_pixels(mempool)
+                unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
 
-    # Set the LED pixels for the mempool
-    for y, led_row in enumerate(mempool_pixels):
-        for x, pixel_color in enumerate(led_row):
-            r, g, b = pixel_color
-            unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
+        unicornhatmini.show()
+        time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
 
-    unicornhatmini.show()
-    time.sleep(5)  # Wait for 5 seconds before refreshing the data and screen
+except KeyboardInterrupt:
+    button_a.close()
+    button_b.close()
+    button_x.close()
+    button_y.close()
