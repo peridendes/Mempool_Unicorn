@@ -62,7 +62,7 @@ def get_data(api_endpoint):
     return None
 
 # New Block Found
-def new_block(block)
+def new_block(block):
     height = block['height']
     reward = round((block['extras']['reward'] / 100000000), 3)
     tx_count = block['tx_count']
