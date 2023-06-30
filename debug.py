@@ -49,27 +49,6 @@ def get_mempool_data():
                 f.write(f"MEMPOOL_NODE_ADDRESS={node_address}\n")
 
     if node_address:
-    #     url = f"{node_address}/api/v1/fees/mempool-blocks"
-    #     max_retries = 3
-    #     retry_interval = 15  # seconds
-    #     retries = 0
-
-    #     while retries < max_retries:
-    #         try:
-    #             data = api_request(url)
-    #             blocks = data[:8]  # Retrieve 8 blocks
-    #             return blocks
-    #         except (requests.exceptions.RequestException, ValueError) as e:
-    #             print(f"Error occurred: {e}")
-    #             print("Retrying after 15 seconds...")
-    #             time.sleep(retry_interval)
-    #             retries += 1
-
-    #     print("Max retries exceeded. Exiting...")
-    # else:
-    #     print("No MEMPOOL_NODE_ADDRESS found. Exiting...")
-
-    # return None
         try:
             url = f"{node_address}/api/v1/fees/mempool-blocks"  
             data = api_request(url)
@@ -110,22 +89,6 @@ def get_block_data():
                 f.write(f"MEMPOOL_NODE_ADDRESS={node_address}\n")
 
     if node_address:
-        # url = f"{node_address}/api/v1/blocks"
-        # max_retries = 3
-        # retry_interval = 15  # seconds
-        # retries = 0
-
-        # while retries < max_retries:
-            # try:
-            #     data = api_request(url)
-            #     blocks = data[:8]  # Retrieve 8 blocks
-            #     return blocks
-            # except (requests.exceptions.RequestException, ValueError) as e:
-            #     print(f"Error occurred: {e}")
-            #     print("Retrying after 15 seconds...")
-            #     time.sleep(retry_interval)
-            #     retries += 1
-
         try:
             url = f"{node_address}/api/v1/blocks"   
             data = api_request(url)

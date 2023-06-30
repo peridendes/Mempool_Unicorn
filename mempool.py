@@ -46,23 +46,16 @@ def get_mempool_data():
                 f.write(f"MEMPOOL_NODE_ADDRESS={node_address}\n")
 
     if node_address:
-        url = f"{node_address}/api/v1/fees/mempool-blocks"
-        max_retries = 3
-        retry_interval = 15  # seconds
-        retries = 0
-
-        while retries < max_retries:
-            try:
-                response = requests.get(url)
-                response.raise_for_status()
-                data = response.json()
-                blocks = data[:8]  # Retrieve 8 blocks
-                return blocks
-            except (requests.exceptions.RequestException, ValueError) as e:
-                print(f"Error occurred: {e}")
-                print("Retrying after 15 seconds...")
-                time.sleep(retry_interval)
-                retries += 1
+        try:
+            url = f"{node_address}/api/v1/fees/mempool-blocks"  
+            data = api_request(url)
+            blocks = data[:8]  # Retrieve 8 blocks
+            return blocks
+        except (requests.exceptions.RequestException, ValueError) as e:
+            print(f"Error occurred: {e}")
+            print("Retrying after 15 seconds...")
+            time.sleep(retry_interval)
+            retries += 1
 
         print("Max retries exceeded. Exiting...")
     else:
@@ -93,23 +86,16 @@ def get_block_data():
                 f.write(f"MEMPOOL_NODE_ADDRESS={node_address}\n")
 
     if node_address:
-        url = f"{node_address}/api/v1/blocks"
-        max_retries = 3
-        retry_interval = 15  # seconds
-        retries = 0
-
-        while retries < max_retries:
-            try:
-                response = requests.get(url)
-                response.raise_for_status()
-                data = response.json()
-                blocks = data[:8]  # Retrieve 8 blocks
-                return blocks
-            except (requests.exceptions.RequestException, ValueError) as e:
-                print(f"Error occurred: {e}")
-                print("Retrying after 15 seconds...")
-                time.sleep(retry_interval)
-                retries += 1
+        try:
+            url = f"{node_address}/api/v1/blocks"   
+            data = api_request(url)
+            blocks = data[:8]  # Retrieve 8 blocks
+            return blocks
+        except (requests.exceptions.RequestException, ValueError) as e:
+            print(f"Error occurred: {e}")
+            print("Retrying after 15 seconds...")
+            time.sleep(retry_interval)
+            retries += 1
 
         print("Max retries exceeded. Exiting...")
     else:
@@ -117,8 +103,8 @@ def get_block_data():
 
     return None
 
-# Function for new block alert
-def new_block_alert(block):
+# Function to retrieve block data from the API
+def get_block_data():
     height = block['height']
     reward = block['extras']['reward']
     reward = reward / 100000000  # Convert fee to whole bitcoin
