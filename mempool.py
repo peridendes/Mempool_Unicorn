@@ -53,9 +53,6 @@ def get_data(api_endpoint):
             return blocks
         except (requests.exceptions.RequestException, ValueError) as e:
             print(f"Error occurred: {e}")
-            print("Retrying after 15 seconds...")
-            time.sleep(retry_interval)
-            retries += 1
 
         print("Max retries exceeded. Exiting...")
     else:
@@ -73,6 +70,8 @@ def new_block(block):
     ]
     sentence = "    ".join(text[1:])
     scroll_text(sentence)
+
+    return None
 
 # Function for scrolling text
 def scroll_text(text):
@@ -107,7 +106,7 @@ def scroll_text(text):
         unicornhatmini.show()
         time.sleep(0.05)
 
-    return 0
+    return None
 
 # Function to calculate the length of the column by the block size
 def calculate_bar_length(block_size):
@@ -159,7 +158,7 @@ def rgb_fees(fee, data_type):
     return r, g, b
 
 # Function to convert mempool data to LED pixels
-def convert_mempool_to_led_pixels(mempool):
+def draw_mempool(mempool):
     led_pixels = []
 
     for i, block in enumerate(mempool):
@@ -191,11 +190,16 @@ def convert_mempool_to_led_pixels(mempool):
         # Append the bar to LED Pixel Matrix
         led_pixels.append(led_bar)
 
-    # LED Pixel Matrix
-    return led_pixels
+    # Set the LED pixels for the mempool
+    for y, led_row in enumerate(led_pixels):
+        for x, pixel_color in enumerate(led_row):
+            r, g, b = pixel_color
+            unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
+
+    unicornhatmini.show()
 
 # Function to convert block data to LED pixels
-def convert_block_data_to_led_pixels(blocks):
+def draw_blocks(blocks):
     led_pixels = []
 
     for block in blocks:
@@ -206,15 +210,30 @@ def convert_block_data_to_led_pixels(blocks):
         # Create a column of LED pixels with the same color       
         led_bar = [led_color] * bar_length
 
+        # Add Empty pixels to fill column to display edge
+        led_bar.extend([(0, 0, 0)] * (display_height - len(led_bar)))
+        
         # Append the pixel data to led_pixels
         led_pixels.append(led_bar)
+    
+    # Set the LED pixels for the blocks
+    for y, led_row in enumerate(led_pixels):
+        for x, pixel_color in enumerate(led_row):
+            r, g, b = pixel_color
+            # Set the pixel for the right 8 columns at the corresponding position
+            unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
 
-    return led_pixels
+    unicornhatmini.show()
 
 def pressed(button):
     button_name = button_map[button.pin.number]
     
     scroll_text(f"Button {button_name} pressed!")
+
+    blocks = get_data("/api/v1/blocks")
+    draw_blocks(blocks)
+    mempool = get_data("/api/v1/fees/mempool-blocks")
+    draw_mempool(mempool)
 
 button_map = {5: "A",
               6: "B",
@@ -266,36 +285,19 @@ try:
 
         # First run and whenever a new block is found
         if blocks[0]['height'] > latest_block:
-            block_pixels = convert_block_data_to_led_pixels(blocks)
-        
             # New block found
             if latest_block != 0:
                 new_block(blocks[0])
+            
+            draw_blocks(blocks)
 
-            # Refresh the entire screen to 0, 0, 0 (off)
-            unicornhatmini.clear()
-
-            # Set the LED pixels for the blocks
-            for y, led_row in enumerate(block_pixels):
-                for x, pixel_color in enumerate(led_row):
-                    r, g, b = pixel_color
-                    # Set the pixel for the right 8 columns at the corresponding position
-                    unicornhatmini.set_pixel(9 + y, display_height - x - 1, r, g, b)
-                    
             # Update tracking of most recent block mined
             latest_block = blocks[0]['height']
-                        
-        # Pull mempool data and change to LED values
+
+        # Pull mempool data
         mempool = get_data("/api/v1/fees/mempool-blocks")
-        mempool_pixels = convert_mempool_to_led_pixels(mempool)
-
-        # Set the LED pixels for the mempool
-        for y, led_row in enumerate(mempool_pixels):
-            for x, pixel_color in enumerate(led_row):
-                r, g, b = pixel_color
-                unicornhatmini.set_pixel(7 - y, display_height - x - 1, r, g, b)
-
-        unicornhatmini.show()
+        draw_mempool(mempool)
+        
         time.sleep(15)  # Wait for 15 seconds before refreshing the data and screen
 
 except KeyboardInterrupt:
