@@ -9,7 +9,6 @@ from PIL import Image, ImageDraw, ImageFont
 from unicornhatmini import UnicornHATMini
 
 def api_request(url):
-    response = None
     for _ in range(3):
         try:
             response = requests.get(url)
@@ -18,9 +17,8 @@ def api_request(url):
         except requests.exceptions.RequestException:
             print("Error occurred. Retrying after 60 seconds...")
             time.sleep(60)  # Wait for 60 seconds before retrying
-    if response is None:
-        raise Exception("Failed to make API request after 3 attempts")
-    return response.json()
+    
+    raise Exception("Failed to make API request after 3 attempts")
 
 # Function to data from the API
 def get_data(api_endpoint):
@@ -63,19 +61,22 @@ def get_data(api_endpoint):
 
     return None
 
-# Function for new block alert
-def new_block_alert(block):
+# New Block Found
+def new_block(block)
     height = block['height']
-    reward = block['extras']['reward']
-    reward = reward / 100000000  # Convert fee to whole bitcoin
-    reward = round(reward, 3)  # Round fee to 3 decimal places
+    reward = round((block['extras']['reward'] / 100000000), 3)
     tx_count = block['tx_count']
     median_fee = block['extras']['medianFee']
 
     # Text to scroll when new block is mined
-    text = f"    New Block {height}    Reward: {reward} BTC    Tx Count: {tx_count}    Median Fee: ~{median_fee} sat/vB    "
+    text = "New Block {}    Reward: {} BTC    Tx Count: {}    Median Fee: ~{} sat/vB"
+    text.format(height, reward, tx_count, median_fee)
 
-    # Load a 5x7 pixel font
+    scroll_text(text)
+
+# Function for scrolling text
+def scroll_text(text):
+     # Load a 5x7 pixel font
     font = ImageFont.truetype("5x7.ttf", 8)
     
     # Measure the width of text
@@ -269,7 +270,7 @@ try:
         
             # New block found
             if latest_block != 0:
-                new_block_alert(blocks[0]) 
+                new_block(block[0])
 
             # Refresh the entire screen to 0, 0, 0 (off)
             unicornhatmini.clear()
