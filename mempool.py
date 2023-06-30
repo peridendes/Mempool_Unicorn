@@ -9,6 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 from unicornhatmini import UnicornHATMini
 
 def api_request(url):
+    response = None
     for _ in range(3):
         try:
             response = requests.get(url)
@@ -17,8 +18,9 @@ def api_request(url):
         except requests.exceptions.RequestException:
             print("Error occurred. Retrying after 60 seconds...")
             time.sleep(60)  # Wait for 60 seconds before retrying
-    
-    raise Exception("Failed to make API request after 3 attempts")
+    if response is None:
+        raise Exception("Failed to make API request after 3 attempts")
+    return response.json()
 
 # Function to data from the API
 def get_data(api_endpoint):
