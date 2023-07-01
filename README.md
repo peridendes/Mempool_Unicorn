@@ -42,7 +42,8 @@ Run the script: `python3 mempool.py`
 
 Mempool Unicorn offers the following features:
 
-- [x] Real-time visualization of pending blocks
+- [x] Real-time visualization of Bitcoin mempool colored by transaction fees
+- [x] New block ticker displays block height, block reward, transaction count, and median fee
 - [ ] Interactive features, such as highlighting the selected block or providing visual indicators for enhanced user experience.
 - [ ] Navigate between different blocks and easily switch the selected block for detailed viewing.
 - [ ] Display additional details about the selected block, such as block height, transaction count, fees, timestamp, and other relevant information.
