@@ -28,7 +28,7 @@ To install and set up Mempool Unicorn, follow these steps:
 
 1. Install Pimoroni UnicornHATMini Stable library from PyPi:
     ```shell
-    $sudo pip3 install unicornhatmini
+    $ sudo pip3 install unicornhatmini
 
 2. Clone the repository:
    ```shell
@@ -36,7 +36,7 @@ To install and set up Mempool Unicorn, follow these steps:
    $ cd Mempool_Unicorn
 
 ## Usage
-1. Run the script:
+Run the script:
     ```shell
     $ python3 mempool.py
 
@@ -73,4 +73,5 @@ If you have any questions or suggestions, feel free to reach out:
 We appreciate your interest and support in the project!
 
 Please donate if you find this project useful.
+
 ![](https://github.com/peridendes/peridendes.github.io/blob/main/assets/images/qr.png?raw=true)
