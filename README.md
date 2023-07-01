@@ -36,9 +36,7 @@ To install and set up Mempool Unicorn, follow these steps:
    $ cd Mempool_Unicorn
 
 ## Usage
-Run the script:
-    ```shell
-    $ python3 mempool.py
+Run the script: `python3 mempool.py`
 
 ## Features
 
