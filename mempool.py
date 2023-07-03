@@ -1,4 +1,5 @@
 from gpiozero import Button
+import logging
 import math
 import os
 import requests
@@ -8,6 +9,15 @@ import time
 from PIL import Image, ImageDraw, ImageFont
 from unicornhatmini import UnicornHATMini
 
+# Configure logging
+logging.basicConfig(filename='script.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Log messages with different severity levels
+# logging.warning('This is a warning message') # Indication of potential issues or non-critical errors
+# logging.error('This is an error message')    # Indicates errors that caused a specific operation to fail
+# logging.critical('This is a critical message')  # Highest level, indicates a critical failure or application crash
+
+
 def api_request(url):
     response = None
     for _ in range(3):
@@ -16,7 +26,7 @@ def api_request(url):
             response.raise_for_status()
             break
         except requests.exceptions.RequestException:
-            print("Error occurred. Retrying after 60 seconds...")
+            logging.warning('Unable to connect to API')
             time.sleep(60)  # Wait for 60 seconds before retrying
     if response is None:
         raise Exception("Failed to make API request after 3 attempts")
@@ -52,7 +62,7 @@ def get_data(api_endpoint):
             blocks = data[:8]  # Retrieve 8 blocks
             return blocks
         except (requests.exceptions.RequestException, ValueError) as e:
-            print(f"Error occurred: {e}")
+            logging.error(f"Error occurred: {e}")
 
         print("Max retries exceeded. Exiting...")
     else:
@@ -243,6 +253,8 @@ button_x = Button(16)
 button_y = Button(24)
 
 # Main program
+logging.info("Script Starting")
+
 print("""Mempool Unicorn: mempool.py
 
 Demonstrates the use of Unicorn HAT Mini to display Mempool.Space
@@ -303,3 +315,6 @@ except KeyboardInterrupt:
     button_b.close()
     button_x.close()
     button_y.close()
+
+finally:
+    logging.info("Script Finished!")
